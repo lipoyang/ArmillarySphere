@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <title>渾天儀コントローラ</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/mystyle.css" />
+  </head>
+
+  <body>
+    <div class="container" style="max-width: 400px">
+      <!-- (1) 接続画面 -->
+      <div id="panel_connect">
+        <div class="row m-2">
+          <div class="col text-center"><h1>渾天儀コントローラ</h1></div>
+        </div>
+        <div class="row my-4 justify-content-center">
+          <div class="col-6 mx-0"><div class="d-grid gap-0">
+              <button id="btn_connect" class="btn btn-primary rounded-pill">接続</button>
+          </div></div>
+        </div>
+        <div class="row my-4" style="font-size: 1.2rem">
+          <div class="col text-center" id="text_connect"></div>
+        </div>
+      </div> <!-- (1) 接続画面 -->
+      
+      <!-- (2) メイン画面 -->
+      <div id="panel_main">
+        <!-- タブ -->
+        <ul class="nav nav-pills nav-justified">
+          <li class="nav-item">
+            <a href="#tab_content1" class="nav-link active" data-bs-toggle="tab" id="tab_season">季節</a>
+          </li>
+          &nbsp;
+          <li class="nav-item">
+            <a href="#tab_content2" class="nav-link" data-bs-toggle="tab" id="tab_time">時刻</a>
+          </li>
+          &nbsp;
+          <li class="nav-item">
+            <a href="#tab_content3" class="nav-link" data-bs-toggle="tab" id="tab_setting">設定</a>
+          </li>
+        </ul>
+
+        <!-- タブの中身 -->
+        <div class="tab-content">
+          <!-- 季節 -->
+          <div id="tab_content1" class="tab-pane active border border-primary rounded my-1">
+            <canvas id='canvasSeason'></canvas>
+          </div>
+          <!-- 時刻 -->
+          <div id="tab_content2" class="tab-pane border border-primary rounded my-1">
+            <canvas id='canvasTime'></canvas>
+          </div>
+          <!-- 設定 -->
+          <div id="tab_content3" class="tab-pane border border-primary rounded my-1">
+            <div class="row my-2">
+              <div class="col ms-3" style="font-size: 1.2rem">
+                タイムゾーン　　UTC 
+                <select id="select_timezone" size="1">
+                  <option>+12</option><option>+11</option><option>+10</option><option> +9</option><option> +8</option><option> +7</option>
+                  <option> +6</option><option> +5</option><option> +4</option><option> +3</option><option> +2</option><option> +1</option>
+                  <option> +0</option>
+                  <option> -1</option><option> -2</option><option> -3</option><option> -4</option><option> -5</option><option> -6</option>
+                  <option> -7</option><option> -8</option><option> -9</option><option>-10</option><option>-11</option><option>-12</option>
+                </select>
+              </div>
+            </div>
+            <div class="row my-2">
+              <div class="col ms-3" style="font-size: 1.2rem">
+                <select id="select_latitude">
+                  <option value="north">北緯</option>
+                  <option value="south">南緯</option>
+                </select>
+                <input type="number" id="number_latitude" min="0" max="90" style="width: 6em;">
+                度
+              </div>
+            </div>
+            <div class="row my-2">
+              <div class="col ms-3" style="font-size: 1.2rem">
+                <select id="select_longitude">
+                  <option value="east">東経</option>
+                  <option value="west">西経</option>
+                </select>
+                <input type="number" id="number_longitude" min="0" max="180" style="width: 6em;">
+                度
+              </div>
+            </div>
+            <div class="row mt-3 mb-2 justify-content-center">
+              <div class="col ms-3"><div class="d-grid gap-0">
+                <button id="btn_init" class="btn btn-primary rounded-pill">初期位置</button>
+              </div></div>
+              <div class="col me-3"><div class="d-grid gap-0">
+                <button id="btn_stop" class="btn btn-primary rounded-pill">停止</button>
+              </div></div>
+            </div>
+            <div class="row my-2 justify-content-center">
+              <div class="col ms-3"><div class="d-grid gap-0">
+                <button id="btn_rotation" class="btn btn-primary rounded-pill">自転</button>
+              </div></div>
+              <div class="col me-3"><div class="d-grid gap-0">
+                <button id="btn_revolution" class="btn btn-primary rounded-pill">公転</button>
+              </div></div>
+            </div>
+            <div class="row mt-2 mb-3 justify-content-center">
+              <div class="col ms-3"><div class="d-grid gap-0">
+                <button id="btn_demo1" class="btn btn-primary rounded-pill">デモ1</button>
+              </div></div>
+              <div class="col me-3"><div class="d-grid gap-0">
+                <button id="btn_demo2" class="btn btn-primary rounded-pill">デモ2</button>
+              </div></div>
+            </div>
+
+          </div> <!-- 設定 -->
+        </div> <!-- タブの中身 -->
+
+        <!-- 日時と位置 -->
+        <div id="panel_date_time" class="border border-primary rounded my-1">
+          <div class="row my-2">
+            <div class="col-3 ms-3" style="font-size: 1.2rem" id="text_timezone"></div>
+            <div class="col" style="font-size: 1.2rem">
+              <input type='datetime-local' min='1901-01-01T00:00' max='2099-11-31T23:59' id='text_datetime'  style="width: 11em;"/>
+            </div>
+          </div>
+          <div class="row my-2" style="font-size: 1.2rem">
+            <div class="col ms-3" id="text_location"></div>
+          </div>
+        </div>
+
+        <!-- 太陽の位置 -->
+        <div id="panel_sun_position" class="border border-primary rounded my-1">
+          <div class="row mt-2 mb-1" style="font-size: 1.2rem">
+            <div class="col ms-3">太陽の位置</div>
+          </div>
+          <div class="row my-0" style="font-size: 1.2rem">
+            <div class="col-3 ms-4">黄経 λ </div>
+            <div class="col" id="text_lambda"></div>
+          </div>
+          <div class="row my-0" style="font-size: 1.2rem">
+            <div class="col-3 ms-4">赤経 α </div>
+            <div class="col" id="text_alpha"></div>
+          </div>
+          <div class="row mb-2" style="font-size: 1.2rem">
+            <div class="col-3 ms-4">赤緯 δ </div>
+            <div class="col" id="text_delta"></div>
+          </div>
+        </div>    
+        
+        <!-- 切断ボタン -->
+        <div class="row my-4 justify-content-center">
+          <div class="col-6 mx-0"><div class="d-grid gap-0">
+              <button id="btn_disconnect" class="btn btn-danger rounded-pill">切断</button>
+          </div></div>
+        </div>
+
+      </div> <!-- (2) メイン画面 -->
+
+    </div> <!-- div class="container" -->
+
+    <!-- スクリプト -->
+    <script src="lib/bootstrap.bundle.min.js"></script>
+    <script src="lib/jsframe.min.js"></script>
+    <script src="SunCalc.js"></script>
+    <script src="ArmilarySphereTool.js"></script>
+  </body>
+</html>
