@@ -103,26 +103,26 @@ void BleCommand::task()
                 switch(command)
                 {
                     case CMD_INIT:
-                        Serial.print("CMD_INIT");
+                        Serial.println("CMD_INIT");
                         break;
                     case CMD_STOP:
-                        Serial.print("CMD_STOP");
+                        Serial.println("CMD_STOP");
                         break;
                     case CMD_ROTATION:
-                        Serial.print("CMD_ROTATION");
+                        Serial.println("CMD_ROTATION");
                         break;
                     case CMD_REVOLUTOIN:
-                        Serial.print("CMD_REVOLUTOIN");
+                        Serial.println("CMD_REVOLUTOIN");
                         break;
                     case CMD_DEMO1:
-                        Serial.print("CMD_DEMO1");
+                        Serial.println("CMD_DEMO1");
                         break;
                     case CMD_DEMO2:
-                        Serial.print("CMD_DEMO2");
+                        Serial.println("CMD_DEMO2");
                         break;
                     default:
                         Serial.print("Unknown Command: ");
-                        Serial.print(command, HEX);
+                        Serial.println(command, HEX);
                         break;
                 }
             }

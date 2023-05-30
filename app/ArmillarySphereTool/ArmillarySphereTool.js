@@ -297,25 +297,19 @@ btn_rotation.addEventListener('click', async function () {
 // 公転ボタン
 btn_revolution.addEventListener('click', async function () {
   const busy = await readBusy();
-  if(!busy){
-    sendCommand(CMD_REVOLUTOIN);
-  }
+  if(!busy) sendCommand(CMD_REVOLUTOIN);
 });
 
 // デモ1ボタン
 btn_demo1.addEventListener('click', async function () {
   const busy = await readBusy();
-  if(!busy){
-    sendCommand(CMD_DEMO1);
-  }
+  if(!busy) sendCommand(CMD_DEMO1);
 });
 
 // デモ2ボタン
 btn_demo2.addEventListener('click', async function () {
-  const busy = readBusy();
-  if(!busy){
-    sendCommand(CMD_DEMO2);
-  }
+  const busy = await readBusy();
+  if(!busy) sendCommand(CMD_DEMO2);
 });
 
 /********** BLEのイベントハンドラ ***********/
