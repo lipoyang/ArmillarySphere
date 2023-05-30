@@ -41,7 +41,7 @@ const text_delta  = document.getElementById('text_delta');
 /********** BLEの定数 ***********/
 
 // BLEサービスのUUID
-const UUID_ArmilarySphere   = "220eb65b-d64d-e553-f51e-a1048818dc96";
+const UUID_ArmillarySphere   = "220eb65b-d64d-e553-f51e-a1048818dc96";
 // BLEキャラクタリスティックのUUID
 const UUID_Command    = "2d3f5dde-42b2-fbfa-3e3f-7673832c7db4"; // コマンド
 const UUID_LonTime    = "328e1678-11b5-5d34-aad2-ef1a4a2957eb"; // 経度とUTC日時を設定
@@ -242,7 +242,7 @@ btn_connect.addEventListener('click', async function () {
     // デバイスを取得 (サービスのUUIDでフィルタ)
     console.log("Requesting Bluetooth Device...");
     bleDevice = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [UUID_ArmilarySphere] }],
+        filters: [{ services: [UUID_ArmillarySphere] }],
     });
     // 切断時イベントハンドラの登録
     bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
@@ -253,7 +253,7 @@ btn_connect.addEventListener('click', async function () {
     // サービスを取得
     text_connect.innerText = "デバイス情報取得中...";
     console.log("Getting Service...");
-    const service = await server.getPrimaryService(UUID_ArmilarySphere);
+    const service = await server.getPrimaryService(UUID_ArmillarySphere);
     // キャラクタリスティックを取得
     console.log("Getting Characteristics...");
     chrCommand   = await service.getCharacteristic(UUID_Command);
@@ -549,7 +549,7 @@ function canvasSeason_zodiac(e) {
   // 太陽の位置の計算
   calc_sun_pos();
   // 渾天儀に指令
-  moveArmilarySphere();
+  moveArmillarySphere();
 }
 
 // 季節表示(ホロスコープ)の春夏秋冬ボタン判定
@@ -607,7 +607,7 @@ function canvasTime_clock(e) {
   // 太陽の位置の計算
   calc_sun_pos();
   // 渾天儀に指令
-  moveArmilarySphere();
+  moveArmillarySphere();
 }
 
 // 時刻表示(時計)の東西南北ボタン判定
@@ -634,7 +634,7 @@ function canvasTime_button(e) {
       // 太陽の位置の計算
       calc_sun_pos();
       // 渾天儀に指令
-      moveArmilarySphere();
+      moveArmillarySphere();
       return;
     }
   }
@@ -670,7 +670,7 @@ function datetime_onchanged()
   // 太陽の位置の計算
   calc_sun_pos();
   // 渾天儀に指令
-  moveArmilarySphere();
+  moveArmillarySphere();
 }
 
 // 日時の取得
@@ -846,7 +846,7 @@ function show_location()
 /********** BLE通信 ***********/
 
 // 渾天儀に経度とUTC日時を指令
-async function moveArmilarySphere()
+async function moveArmillarySphere()
 {
   if(bleDevice == null) return;
 
@@ -855,7 +855,7 @@ async function moveArmilarySphere()
   const elapsed = now - last_time;
   if(elapsed < SEND_INTERVAL){
     // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
-    if(pending == false) setTimeout(moveArmilarySphere, SEND_DELAY);
+    if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
     pending= true; // 保留セット
     return;
   }
