@@ -1,17 +1,6 @@
 #include <stdint.h>
 #include "BleCommand.h"
-
-// 経度とUTC日時
-struct LonTime
-{
-    float       lon;
-    uint16_t    year;
-    uint8_t     month;
-    uint8_t     day;
-    uint8_t     hour;
-    uint8_t     min;
-};
-static LonTime lonTime;
+#include "Debug.h"
 
 // BLEサービス
 BLEService svcArmillarySphere("220EB65B-D64D-E553-F51E-A1048818DC96");
@@ -83,6 +72,8 @@ void BleCommand::begin()
 // タスク
 void BleCommand::task()
 {
+    static char buff[128];
+    
     if(!isConnected){
         central = BLE.central();
         if (central)
@@ -104,21 +95,27 @@ void BleCommand::task()
                 {
                     case CMD_INIT:
                         Serial.println("CMD_INIT");
+                        if(onCommandInit != nullptr) onCommandInit();
                         break;
                     case CMD_STOP:
                         Serial.println("CMD_STOP");
+                        if(onCommandStop != nullptr) onCommandStop();
                         break;
                     case CMD_ROTATION:
                         Serial.println("CMD_ROTATION");
+                        if(onCommandRotation != nullptr) onCommandRotation();
                         break;
                     case CMD_REVOLUTOIN:
                         Serial.println("CMD_REVOLUTOIN");
+                        if(onCommandRevolution != nullptr) onCommandRevolution();
                         break;
                     case CMD_DEMO1:
                         Serial.println("CMD_DEMO1");
+                        if(onCommandDemo1 != nullptr) onCommandDemo1();
                         break;
                     case CMD_DEMO2:
                         Serial.println("CMD_DEMO2");
+                        if(onCommandDemo2 != nullptr) onCommandDemo2();
                         break;
                     default:
                         Serial.print("Unknown Command: ");
@@ -129,14 +126,30 @@ void BleCommand::task()
             // 経度とUTC日時
             if (chrLonTime.written())
             {
-                LonTime lonTime = chrLonTime.value();
-                static char buff[128];
-                sprintf(buff, "Lon = %.4f\n", lonTime.lon);
-                Serial.print(buff);
-                sprintf(buff, "UTC = %4d/%02d/%02d %02d:%02d\n",
-                    lonTime.year, lonTime.month, lonTime.day,
-                    lonTime.hour, lonTime.min);
-                Serial.print(buff);
+                lonTime = chrLonTime.value();
+                float lon = lonTime.lon;
+                int y = lonTime.year;
+                int m = lonTime.month;
+                int d = lonTime.day;
+                int h = lonTime.hour;
+                int n = lonTime.min;
+                
+                // 範囲のチェック
+                int error = 0;
+                if(!(-180 <= lon && lon <= 180)) error = 1;
+                if(!(1901 <= y && y <= 2099)) error = 2;
+                if(!(   1 <= m && m <=   12)) error = 3;
+                if(!(   1 <= d && d <=   31)) error = 4;
+                if(!(   0 <= h && h <=   23)) error = 5;
+                if(!(   0 <= n && n <=   59)) error = 6;
+                if(error != 0){
+                    DEBUG_PRINT("Parameter Error #%d\n", error);
+                }
+                
+                DEBUG_PRINT("Lon = %.4f\n", lon);
+                DEBUG_PRINT("UTC = %4d/%02d/%02d %02d:%02d\n", y, m, d, h, n);
+                
+                if(onCommandLonTime != nullptr) onCommandLonTime();
             }
             
         }else{
