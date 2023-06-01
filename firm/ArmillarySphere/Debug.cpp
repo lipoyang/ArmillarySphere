@@ -7,7 +7,7 @@ void debug_print(char *format, ...)
   
   va_list args;
   va_start(args , format);
-  sprintf(buff, format, args);
+  vsprintf(buff, format, args);
   va_end(args);
 
   Serial.print(buff);
