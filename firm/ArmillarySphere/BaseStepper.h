@@ -40,6 +40,10 @@ public:
     void rotateV(double deg, double dps);
     void moveT  (double deg, double sec);
     void moveV  (double deg, double dps);
+    
+    // 位置の取得
+    int getPos();
+    int getAngle();
 
 private:
     const int POL;  // 回転の極性(1/-1)

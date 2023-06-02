@@ -134,4 +134,16 @@ void BaseStepper::moveV(double deg, double dps)
   setPosV(pos, V);
 }
 
+// 位置の取得
+// return: ステップ位置
+int BaseStepper::getPos()
+{
+    return this->pos_now;
+}
 
+// 角度の取得
+// return: 角度[deg]
+int BaseStepper::getAngle()
+{
+    return (360 * this->pos_now / SPR);
+}

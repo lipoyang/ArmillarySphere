@@ -4,12 +4,14 @@
 #include "BleCommand.h"
 #include "Debug.h"
 
-// ピン番号 TODO
-#define MOTOR1_DIR   21
-#define MOTOR1_STP   20
-#define MOTOR2_DIR   9
-#define MOTOR2_STP   8
-#define LED_SUN      10
+// ピン番号
+#define MOTOR1_DIR   0
+#define MOTOR1_STP   1
+#define MOTOR2_DIR   2
+#define MOTOR2_STP   3
+#define LED_SUN      8
+#define HALL_SENSOR1 9
+#define HALL_SENSOR2 10
 
 // 1ステップ=5.625°= 360°/64, ギア比1/32, フルステップ
 #define STEP_PER_REV (64*32*1)
@@ -37,6 +39,84 @@ SunCalc sun;
 // BLEコマンドクラス
 BleCommand bleCommand;
 
+// 初期位置出し(太陽が春分点で南中)
+static void initPosition()
+{
+    Serial.println("Motor position initializing...");
+    
+    int state[2]    = {0, 0};
+    int position[2];
+    int hall[2];
+    DRV8825 *motor[2] = {&motor1, &motor2};
+    
+    // ホールセンサ入力の取得
+    hall[0] = digitalRead(HALL_SENSOR1);
+    hall[1] = digitalRead(HALL_SENSOR2);
+    
+    // もしホールセンサがHIGHなら少し逆転しておく
+    if(hall[0] == HIGH) motor1.rotateT(-30, 0.5);
+    if(hall[1] == HIGH) motor2.rotateT(-30, 0.5);
+    while(!motor1.isIdle() || !motor2.isIdle()){
+        motor1.update();
+        motor2.update();
+        delay(1);
+    }
+    // 正転開始
+    motor1.rotateT(360, 6);
+    motor2.rotateT(360, 6);
+    
+    while(true)
+    {
+        // ホールセンサ入力の取得
+        hall[0] = digitalRead(HALL_SENSOR1);
+        hall[1] = digitalRead(HALL_SENSOR2);
+        
+        // モータごとの制御
+        for(int i=0; i<2; i++)
+        {
+            switch(state[i])
+            {
+            // 正転中(ホールセンサがHIGHになるまで進む)
+            case 0:
+                if (hall[i] == HIGH){
+                    state[i] = 1;
+                    position[i] = motor[i]->getPos();
+                    motor[i]->rotateT(180, 12);
+                }
+                break;
+            // 正転中(ホールセンサがLOWになるまでさらに進む)
+            case 1:
+                if (hall[i] == LOW){
+                    state[i] = 2;
+                    int step = (motor[i]->getPos() - position[i]) / 2;
+                    motor[i]->setStepV(-step, 100);
+                }
+                break;
+            // 逆転中(追加で進んだステップ数の半分だけ戻る)
+            case 2:
+                if(motor[i]->isIdle()){
+                    state[i] = 3;
+                }
+                break;
+            // 初期位置出し完了
+            case 3:
+                break;
+            }
+        }
+        
+        // 両方のモータの初期位置出しが完了したら終了
+        if((state[0] == 3) && (state[1] == 3)){
+            Serial.println("Motor position initialized!");
+            break;
+        }
+        
+        // モータの制御更新
+        motor1.update();
+        motor2.update();
+        delay(1);
+    }
+}
+
 // -360～+360°の角度を-180°～+180°に変換する
 static double deg_range180(double x)
 {
@@ -46,43 +126,43 @@ static double deg_range180(double x)
 }
 
 // 初期位置コマンドのとき
-void onCommandInit()
+static void onCommandInit()
 {
     Serial.println("onCommandInit");
 }
 
 // 停止コマンドのとき
-void onCommandStop()
+static void onCommandStop()
 {
     Serial.println("onCommandStop");
 }
 
 // 自転コマンドのとき
-void onCommandRotation()
+static void onCommandRotation()
 {
     Serial.println("onCommandRotation");
 }
 
 // 公転コマンドのとき
-void onCommandRevolution()
+static void onCommandRevolution()
 {
     Serial.println("onCommandRevolution");
 }
 
 // デモ1コマンドのとき
-void onCommandDemo1()
+static void onCommandDemo1()
 {
     Serial.println("onCommandDemo1");
 }
 
 // デモ2コマンドのとき
-void onCommandDemo2()
+static void onCommandDemo2()
 {
     Serial.println("onCommandDemo2");
 }
 
 // 経度・UTC日時の設定のとき
-void onCommandLonTime()
+static void onCommandLonTime()
 {
     Serial.println("onCommandLonTime");
     
