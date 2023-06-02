@@ -39,6 +39,14 @@ SunCalc sun;
 // BLEコマンドクラス
 BleCommand bleCommand;
 
+// -360～+360°の角度を-180°～+180°に変換する
+static double deg_range180(double x)
+{
+    if(x >  180.0) x -= 360.0;
+    if(x < -180.0) x += 360.0;
+    return x;
+}
+
 // 初期位置出し(太陽が春分点で南中)
 static void initPosition()
 {
@@ -115,14 +123,6 @@ static void initPosition()
         motor2.update();
         delay(1);
     }
-}
-
-// -360～+360°の角度を-180°～+180°に変換する
-static double deg_range180(double x)
-{
-    if(x >  180.0) x -= 360.0;
-    if(x < -180.0) x += 360.0;
-    return x;
 }
 
 // 初期位置コマンドのとき
@@ -214,19 +214,30 @@ static void onCommandLonTime()
 // 初期化
 void setup()
 {
-    // LEDの初期化
-    pinMode(LED_SUN,  OUTPUT);
-    digitalWrite(LED_SUN, HIGH);
-    
-    // シリアル
-    Serial.begin(115200);
-    delay(100); // TODO
-    while(!Serial){;} // TODO
-    Serial.println("Hello!");
+    // VBUS detect
+    uint32_t usb_reg = NRF_POWER->USBREGSTATUS;
+    if (usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk)
+    {
+        Serial.begin(115200);
+        while(!Serial);
+        delay(100);
+        Serial.println("VBUS Detected!");
+    }
     
     // モータの初期化
     motor1.begin();
     motor2.begin();
+    
+    // ホールセンサの初期化
+    pinMode(HALL_SENSOR1, INPUT);
+    pinMode(HALL_SENSOR2, INPUT);
+    
+    // LEDの点灯
+    pinMode(LED_SUN,    OUTPUT);
+    digitalWrite(LED_SUN,    HIGH);
+    
+    // 初期位置出し(太陽が春分点で南中)
+    initPosition();
     
     // BLEコマンドの初期化
     bleCommand.onCommandInit       = onCommandInit;
@@ -297,3 +308,4 @@ void loop()
     }
     motors_idle_old = motors_idle;
 }
+
