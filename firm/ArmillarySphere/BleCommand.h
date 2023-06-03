@@ -18,6 +18,7 @@ class BleCommand
 public:
     void begin();
     void task();
+    void setBusy(bool busy);
     
     void (*onCommandInit)();
     void (*onCommandStop)();

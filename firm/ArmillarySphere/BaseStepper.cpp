@@ -7,12 +7,13 @@ void BaseStepper::init()
 {
   pos_now = 0;
   pos_target = 0;
+  infinit = false;
 }
 
 // 更新(じゅうぶん短い周期で呼ぶ)
 void BaseStepper::update()
 {
-  if(pos_now != pos_target)
+  if((pos_now != pos_target) || (infinit == true))
   {
     int now = getTime();
     int elapse = now - t0;
@@ -30,12 +31,13 @@ void BaseStepper::update()
 void BaseStepper::stop()
 {
   pos_target = pos_now;
+  infinit = false;
 }
 
 // 停止中か？
 bool BaseStepper::isIdle()
 {
-  return (pos_now == pos_target);
+  return ((pos_now == pos_target) && (infinit = false));
 }
 
 // ステップ数だけ回転
@@ -50,6 +52,8 @@ void BaseStepper::setStepT(int step, int msec)
   this->T = msec * 1000;
   this->t0 = getTime();
   this->tn = T / N;
+  
+  this->infinit = false;
 }
 
 // ステップ数だけ回転
@@ -64,6 +68,8 @@ void BaseStepper::setStepV(int step, int sps)
   this->T = (int)((int64_t)abs(step) * 1000000 / (int64_t)sps);
   this->t0 = getTime();
   this->tn = T / N;
+  
+  this->infinit = false;
 }
 
 // 目標位置まで回転
@@ -79,6 +85,8 @@ void BaseStepper::setPosT(int pos, int msec)
   this->T = msec * 1000;
   this->t0 = getTime();
   this->tn = T / N;
+  
+  this->infinit = false;
 }
 
 // 目標位置まで回転
@@ -94,6 +102,8 @@ void BaseStepper::setPosV(int pos, int sps)
   this->T = (int)((int64_t)abs(step) * 1000000 / (int64_t)sps);
   this->t0 = getTime();
   this->tn = T / N;
+  
+  this->infinit = false;
 }
 
 // 指定角度だけ回転
@@ -134,6 +144,25 @@ void BaseStepper::moveV(double deg, double dps)
   setPosV(pos, V);
 }
 
+// 無限回転 (ステップ数ベース)
+// sps: 速度[step/sec] ※正負があることに注意
+void BaseStepper::setV(int sps)
+{
+  int step = (sps >= 0) ? SPR : -SPR;
+  sps = abs(sps);
+  setStepV(step, sps);
+
+  this->infinit = true;
+}
+
+// 無限回転 (角度ベース)
+// dps: 速度[deg/sec] ※正負があることに注意
+void BaseStepper::rotateV(double dps)
+{
+  int V   = SPR * dps / 360;
+  setV(V);
+}
+
 // 位置の取得
 // return: ステップ位置
 int BaseStepper::getPos()
@@ -146,4 +175,21 @@ int BaseStepper::getPos()
 int BaseStepper::getAngle()
 {
     return (360 * this->pos_now / SPR);
+}
+
+// 位置のリセット
+void BaseStepper::resetPos()
+{
+    pos_now = 0;
+    pos_target = 0;
+    infinit = false;
+}
+
+// 位置の換算 (±180°に相当する範囲の値に)
+void BaseStepper::modPos()
+{
+    pos_now = pos_now % SPR;
+    if (pos_now > (SPR/2)) pos_now -= SPR;
+    pos_target = pos_now;
+    infinit = false;
 }

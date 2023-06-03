@@ -159,3 +159,13 @@ void BleCommand::task()
         }
     }
 }
+
+// ビジー状態をセット/クリア
+void BleCommand::setBusy(bool busy)
+{
+    if(busy){
+        chrBusy.writeValue(1);
+    }else{
+        chrBusy.writeValue(0);
+    }
+}

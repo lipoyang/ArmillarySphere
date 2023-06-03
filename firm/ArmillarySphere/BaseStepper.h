@@ -41,9 +41,16 @@ public:
     void moveT  (double deg, double sec);
     void moveV  (double deg, double dps);
     
+    // 無限回転
+    void setV(int sps);         // ステップ数ベース
+    void rotateV(double dps);   // 角度ベース
+    
     // 位置の取得
     int getPos();
     int getAngle();
+    // 位置のリセット、換算
+    void resetPos();
+    void modPos();
 
 private:
     const int POL;  // 回転の極性(1/-1)
@@ -56,4 +63,5 @@ private:
     int T;          // 始点から目標位置までの移動時間[usec]
     int t0;         // 始点の時刻[usec]
     int tn;         // 次のステップ時刻[usec]
+    bool infinit;   // 無限回転か？
 };

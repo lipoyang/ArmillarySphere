@@ -20,15 +20,11 @@
 DRV8825 motor1(MOTOR1_DIR, MOTOR1_STP, 1, STEP_PER_REV);
 DRV8825 motor2(MOTOR2_DIR, MOTOR2_STP, 1, STEP_PER_REV);
 
+// 初期化フラグ
+static bool initializing = false;
 // モータの角度[deg]
 static double theta1 = 0.0;
 static double theta2 = 0.0;
-// モータの回転量[deg]と回転時間[sec]の指令値
-static double d_theta1 = 0.0;
-static double d_theta2 = 0.0;
-static double d_T = 0.0;
-// モータの回転要求
-static bool request_rotate = false;
 
 // モータの回転速度上限[deg/sec]
 const double V_MAX = 60.0;
@@ -50,6 +46,8 @@ static double deg_range180(double x)
 // 初期位置出し(太陽が春分点で南中)
 static void initPosition()
 {
+    bleCommand.setBusy(true);
+    
     Serial.println("Motor position initializing...");
     
     int state[2]    = {0, 0};
@@ -122,43 +120,97 @@ static void initPosition()
         motor1.update();
         motor2.update();
         delay(1);
+        
+        // BLEタスクの実行 TODO
+        bleCommand.task();
     }
+    bleCommand.setBusy(false);
 }
 
 // 初期位置コマンドのとき
 static void onCommandInit()
 {
     Serial.println("onCommandInit");
+    
+    // モータのアイドル判定
+    bool motors_idle = motor1.isIdle() && motor2.isIdle();
+    if(!motors_idle){
+        Serial.println("Motor Busy");
+        return;
+    }
+    
+    initializing = true;
 }
 
 // 停止コマンドのとき
 static void onCommandStop()
 {
     Serial.println("onCommandStop");
+    
+    motor1.stop();
+    motor2.stop();
 }
 
 // 自転コマンドのとき
 static void onCommandRotation()
 {
     Serial.println("onCommandRotation");
+    
+    // モータのアイドル判定
+    bool motors_idle = motor1.isIdle() && motor2.isIdle();
+    if(!motors_idle){
+        Serial.println("Motor Busy");
+        return;
+    }
+    
+    motor1.rotateV(V_MAX);
 }
 
 // 公転コマンドのとき
 static void onCommandRevolution()
 {
     Serial.println("onCommandRevolution");
+    
+    // モータのアイドル判定
+    bool motors_idle = motor1.isIdle() && motor2.isIdle();
+    if(!motors_idle){
+        Serial.println("Motor Busy");
+        return;
+    }
+    
+    motor2.rotateV(V_MAX);
 }
 
 // デモ1コマンドのとき
 static void onCommandDemo1()
 {
     Serial.println("onCommandDemo1");
+    
+    // モータのアイドル判定
+    bool motors_idle = motor1.isIdle() && motor2.isIdle();
+    if(!motors_idle){
+        Serial.println("Motor Busy");
+        return;
+    }
+    
+    motor1.rotateV(V_MAX);
+    motor2.rotateV(V_MAX);
 }
 
 // デモ2コマンドのとき
 static void onCommandDemo2()
 {
     Serial.println("onCommandDemo2");
+    
+    // モータのアイドル判定
+    bool motors_idle = motor1.isIdle() && motor2.isIdle();
+    if(!motors_idle){
+        Serial.println("Motor Busy");
+        return;
+    }
+    
+    motor1.rotateV(V_MAX);
+    motor2.rotateV(V_MAX / 4);
 }
 
 // 経度・UTC日時の設定のとき
@@ -177,6 +229,7 @@ static void onCommandLonTime()
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
+        return;
     }
     
     // 日時と観測地点の緯度・経度を設定して太陽の位置を計算
@@ -195,8 +248,8 @@ static void onCommandLonTime()
     DEBUG_PRINT("theta1 = %7.2f\n", _theta1);
     
     // モータの回転量
-    d_theta1 = deg_range180( _theta1 - theta1 );
-    d_theta2 = deg_range180( _theta2 - theta2 );
+    double d_theta1 = deg_range180( _theta1 - theta1 );
+    double d_theta2 = deg_range180( _theta2 - theta2 );
     theta1 = _theta1;
     theta2 = _theta2;
     DEBUG_PRINT("d_theta1 = %7.2f\n", d_theta1);
@@ -205,10 +258,12 @@ static void onCommandLonTime()
     // 回転時間
     double T1 = fabs(d_theta1 / V_MAX);
     double T2 = fabs(d_theta2 / V_MAX);
-    d_T = (T1 > T2) ? T1 : T2;
-    DEBUG_PRINT("T = %f\n", d_T);
+    double T = (T1 > T2) ? T1 : T2;
+    DEBUG_PRINT("T = %f\n", T);
     
-    request_rotate = true;
+    // モータの回転指令
+    motor1.rotateT(d_theta1, T);
+    motor2.rotateT(d_theta2, T);
 }
 
 // 初期化
@@ -236,9 +291,6 @@ void setup()
     pinMode(LED_SUN,    OUTPUT);
     digitalWrite(LED_SUN,    HIGH);
     
-    // 初期位置出し(太陽が春分点で南中)
-    initPosition();
-    
     // BLEコマンドの初期化
     bleCommand.onCommandInit       = onCommandInit;
     bleCommand.onCommandStop       = onCommandStop;
@@ -248,64 +300,33 @@ void setup()
     bleCommand.onCommandDemo2      = onCommandDemo2;
     bleCommand.onCommandLonTime    = onCommandLonTime;
     bleCommand.begin();
+
+    // 初期位置出し(太陽が春分点で南中)
+    initPosition();
 }
 
 // メインループ
 void loop()
 {
-    static int demo = 0;
-    
+    // BLEタスク
     bleCommand.task();
 
-    // モータがアイドル状態か？
+    // モータがアイドル状態かチェック
     static bool motors_idle_old = true;
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
-    
-    if(demo == 0){
-        if(motors_idle){
-            // デモモード要求？
-            if(Serial.available() > 0){
-                char c = Serial.read();
-                if(c == 'd'){
-                    demo = 1;
-                    motor1.rotateV(360, V_MAX);
-                }
-            }
-            // モータの回転要求があったか？
-            else if(request_rotate){
-                request_rotate = false;
-                Serial.println("Motors rotating...");
-                // モータの回転指令
-                motor1.rotateT(d_theta1, d_T);
-                motor2.rotateT(d_theta2, d_T);
-            }
-            if(!motors_idle_old){
-                Serial.println("Motors rotated!");
-            }
-            //delay(1);
-        }else{
-            // モータの制御更新
-            motor1.update();
-            motor2.update();
-            //delay(1);
-        }
-    }else{
-        if(motors_idle){
-            motor1.rotateV(360, V_MAX);
-        }else{
-            // モータの制御更新
-            motor1.update();
-            motor2.update();
-            //delay(1);
-        }
-        // デモモード終了？
-        if(Serial.available() > 0){
-            char c = Serial.read();
-            if(c == 's'){
-                demo = 0;
-            }
-        }
+    if(motors_idle && !motors_idle_old){
+        Serial.println("Motors rotated!");
     }
     motors_idle_old = motors_idle;
+    bleCommand.setBusy(!motors_idle);
+    
+    // 初期位置出し
+    if(initializing){
+        initializing = false;
+        initPosition();
+    }
+    
+    // モータの制御更新
+    motor1.update();
+    motor2.update();
 }
-
