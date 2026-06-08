@@ -99,7 +99,7 @@ window.onload = function() {
   canvas_R = canvasSeason.width / 2;
 
   // 日時の設定
-  text_datetime.value = "2023-03-21T12:00";
+  text_datetime.value = "2026-03-20T12:00";
 
   // 季節キャンバスの初期表示
   draw_season();
