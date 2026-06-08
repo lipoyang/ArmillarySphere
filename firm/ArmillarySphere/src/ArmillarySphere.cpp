@@ -5,13 +5,13 @@
 #include "Debug.h"
 
 // ピン番号
-#define MOTOR1_DIR   0
-#define MOTOR1_STP   1
-#define MOTOR2_DIR   2
-#define MOTOR2_STP   3
-#define LED_SUN      8
-#define HALL_SENSOR1 9
-#define HALL_SENSOR2 10
+#define MOTOR1_DIR   D0
+#define MOTOR1_STP   D1
+#define MOTOR2_DIR   D2
+#define MOTOR2_STP   D3
+#define LED_SUN      D8
+#define HALL_SENSOR1 D9
+#define HALL_SENSOR2 D10
 
 // 1ステップ=5.625°= 360°/64, ギア比1/32, フルステップ
 #define STEP_PER_REV (64*32*1)
