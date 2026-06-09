@@ -81,8 +81,14 @@ let canvas_isTouched = false; // タッチ中フラグ
 /********** 初期化処理 ***********/
 
 // 読み込み時の処理
-window.onload = function() {
+window.onload = function()
+{
+  //draw_canvas();
+}
 
+// キャンバス描画
+function draw_canvas()
+{
   // キャンバスサイスの調整
   const divSeason = document.getElementById('tab_content1'); // 季節キャンバスのラッパ
   const divTime   = document.getElementById('tab_content2'); // 時刻キャンバスのラッパ
@@ -262,6 +268,8 @@ btn_connect.addEventListener('click', async function () {
     // 画面表示切替
     panel_connect.style.display = "none";
     panel_main.style.display = "block";
+    // キャンバス表示
+    draw_canvas();
 
   } catch (error) {
     error_toast(error);
