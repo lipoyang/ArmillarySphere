@@ -269,16 +269,13 @@ static void onCommandLonTime()
 // 初期化
 void setup()
 {
-    // VBUS detect
-    uint32_t usb_reg = NRF_POWER->USBREGSTATUS;
-    if (usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk)
-    {
-        Serial.begin(115200);
-        while(!Serial);
-        delay(100);
-        Serial.println("VBUS Detected!");
-    }
-    
+    Serial.begin(115200);
+#if 1
+    while(!Serial);
+    delay(100);
+    Serial.println("Start!");
+#endif
+
     // モータの初期化
     motor1.begin();
     motor2.begin();
