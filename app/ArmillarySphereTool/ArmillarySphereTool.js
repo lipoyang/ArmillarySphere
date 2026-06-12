@@ -287,8 +287,9 @@ btn_disconnect.addEventListener('click', async function () {
 
 // 初期位置ボタン
 btn_init.addEventListener('click', async function () {
-  const busy = await readBusy();
-  if(!busy) sendCommand(CMD_INIT);
+  //const busy = await readBusy();
+  //if(!busy)
+  sendCommand(CMD_INIT);
 });
 
 // 停止ボタン
@@ -298,26 +299,30 @@ btn_stop.addEventListener('click', async function () {
 
 // 自転ボタン
 btn_rotation.addEventListener('click', async function () {
-  const busy = await readBusy();
-  if(!busy) sendCommand(CMD_ROTATION);
+  //const busy = await readBusy();
+  //if(!busy)
+  sendCommand(CMD_ROTATION);
 });
 
 // 公転ボタン
 btn_revolution.addEventListener('click', async function () {
-  const busy = await readBusy();
-  if(!busy) sendCommand(CMD_REVOLUTOIN);
+  //const busy = await readBusy();
+  //if(!busy)
+  sendCommand(CMD_REVOLUTOIN);
 });
 
 // デモ1ボタン
 btn_demo1.addEventListener('click', async function () {
-  const busy = await readBusy();
-  if(!busy) sendCommand(CMD_DEMO1);
+  //const busy = await readBusy();
+  //if(!busy)
+  sendCommand(CMD_DEMO1);
 });
 
 // デモ2ボタン
 btn_demo2.addEventListener('click', async function () {
-  const busy = await readBusy();
-  if(!busy) sendCommand(CMD_DEMO2);
+  //const busy = await readBusy();
+  //if(!busy)
+  sendCommand(CMD_DEMO2);
 });
 
 /********** BLEのイベントハンドラ ***********/
@@ -865,8 +870,8 @@ async function moveArmillarySphere()
   pending = false; // 保留クリア
 
   // Busy確認
-  const busy = await readBusy();
-  if(!busy)
+  //const busy = await readBusy();
+  //if(!busy)
   {
     // 経度とUTC日時
     const longitude = Number(number_longitude.value);
@@ -875,10 +880,15 @@ async function moveArmillarySphere()
     const utc_datetime = utc_datetime_get(local_datetime, timezone);
 
     // 送信
-    sendLonTime(
+    await sendLonTime(
       longitude,
       utc_datetime.year, utc_datetime.month, utc_datetime.day,
-      utc_datetime.hour, utc_datetime.min);
+      utc_datetime.hour, utc_datetime.min
+    ).catch(()=>{
+      // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
+      if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
+      pending= true; // 保留セット
+    });
   }
 }
 
@@ -910,8 +920,10 @@ async function sendLonTime(longitude, year, month, day, hour, min) {
 
   await chrLonTime.writeValue(bArray).then(() => {
     console.log('chrLonTime:' + bArray);
-  }).catch(()=>{
-    error_toast('ERROR! chrLonTime');
+  }).catch((error)=>{
+    // console.log("Bluetooth Write Error:", error);
+    // error_toast('ERROR! chrLonTime');
+    throw error;
   });
 }
 
@@ -927,8 +939,9 @@ async function readBusy(){
     }else{
       return false;
     }
-  }).catch(()=>{
-    error_toast('ERROR! chrBusy');
+  }).catch((error)=>{
+    // console.error("Bluetooth Read Error:", error);
+    // error_toast('ERROR! chrBusy');
     return true;
   });
 }
