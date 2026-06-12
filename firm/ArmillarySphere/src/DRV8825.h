@@ -12,7 +12,7 @@ private:
 public:
     // コンストラクタ
     DRV8825(int dir, int stp, int pol, int spr) : 
-        PIN_DIR(dir), PIN_STP(stp), BaseStepper(pol, spr){}
+        BaseStepper(pol, spr), PIN_DIR(dir), PIN_STP(stp){}
 
     // モータドライバICごとに実装するメソッド
     void begin();                    // 初期化

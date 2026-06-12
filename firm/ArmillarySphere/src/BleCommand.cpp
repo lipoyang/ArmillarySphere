@@ -72,8 +72,6 @@ void BleCommand::begin()
 // タスク
 void BleCommand::task()
 {
-    static char buff[128];
-    
     if(!isConnected){
         central = BLE.central();
         if (central)

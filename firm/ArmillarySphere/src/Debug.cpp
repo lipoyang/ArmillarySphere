@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "Debug.h"
 
-void debug_print(char *format, ...)
+void debug_print(const char *format, ...)
 {
   static char buff[256];
   

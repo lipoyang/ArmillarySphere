@@ -10,4 +10,4 @@
 #define DEBUG_PRINT(format, ...) 
 #endif
 
-void debug_print(char *format, ...);
+void debug_print(const char *format, ...);
