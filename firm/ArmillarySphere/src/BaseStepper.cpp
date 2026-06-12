@@ -37,7 +37,7 @@ void BaseStepper::stop()
 // 停止中か？
 bool BaseStepper::isIdle()
 {
-  return ((pos_now == pos_target) && (infinit = false));
+  return ((pos_now == pos_target) && (infinit == false));
 }
 
 // ステップ数だけ回転
