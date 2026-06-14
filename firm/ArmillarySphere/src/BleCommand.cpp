@@ -62,6 +62,7 @@ void BleCommand::begin()
     lonTime.day   = 1;
     lonTime.hour  = 0;
     lonTime.min   = 0;
+    lonTime.timezone = 9;
     chrLonTime.writeValue(lonTime);
     chrBusy.writeValue(0);
     
@@ -79,6 +80,7 @@ void BleCommand::task()
             isConnected = true;
             Serial.print("BLE Connected to central: ");
             Serial.println(central.address());
+            if(onConnected != nullptr) onConnected();
         }
     }else{
         if(central.connected())
@@ -131,6 +133,7 @@ void BleCommand::task()
                 int d = lonTime.day;
                 int h = lonTime.hour;
                 int n = lonTime.min;
+                int timezone = lonTime.timezone;
                 
                 // 範囲のチェック
                 int error = 0;
@@ -140,12 +143,14 @@ void BleCommand::task()
                 if(!(   1 <= d && d <=   31)) error = 4;
                 if(!(   0 <= h && h <=   23)) error = 5;
                 if(!(   0 <= n && n <=   59)) error = 6;
+                if(!(-12 <= timezone && timezone <= 12)) error = 7;
                 if(error != 0){
                     DEBUG_PRINT("Parameter Error #%d\n", error);
                 }
                 
                 DEBUG_PRINT("Lon = %.4f\n", lon);
                 DEBUG_PRINT("UTC = %4d/%02d/%02d %02d:%02d\n", y, m, d, h, n);
+                DEBUG_PRINT("Timezone = %d\n", timezone);
                 
                 if(onCommandLonTime != nullptr) onCommandLonTime();
             }
@@ -154,6 +159,7 @@ void BleCommand::task()
             isConnected = false;
             Serial.print(F("BLE Disconnected from central: "));
             Serial.println(central.address());
+            if(onDisconnected != nullptr) onDisconnected();
         }
     }
 }

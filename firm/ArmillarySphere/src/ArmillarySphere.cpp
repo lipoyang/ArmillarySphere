@@ -2,6 +2,7 @@
 #include "DRV8825.h"
 #include "SunCalc.h"
 #include "BleCommand.h"
+//#include "M5UI.h"
 #include "Debug.h"
 
 // ピン番号
@@ -34,6 +35,70 @@ SunCalc sun;
 
 // BLEコマンドクラス
 BleCommand bleCommand;
+
+// M5Stack UIクラス
+// M5UI ui;
+
+// 日時
+struct DateTime {
+    int y; // 年
+    int m; // 月
+    int d; // 日
+    int h; // 時
+    int n; // 分
+};
+
+// うるう年判定
+bool isLeap(int y) {
+    return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+}
+
+// 月ごとの日数
+int daysInMonth(int y, int m){
+    static const int days[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    if (m == 2 && isLeap(y)) return 29;
+    return days[m-1];
+}
+
+// ローカル時刻の計算
+// utc : UTC時刻
+// timezone : タイムゾーン [時]
+// return : ローカル時刻
+DateTime utc2local(DateTime &utc, int timezone)
+{
+    DateTime t = utc;
+
+    // 1) 時差を加算
+    t.h += timezone;
+
+    // 2) 日の繰り上がり・繰り下がり
+    if(t.h >= 24){
+        t.h -= 24;
+        t.d += 1;
+    }else if(t.h < 0){
+        t.h += 24;
+        t.d -= 1;
+    }
+
+    // 3) 月・年の繰り上がり・繰り下がり
+    int dim = daysInMonth(t.y, t.m);
+    if(t.d > dim){
+        t.m += 1;
+        if(t.m > 12){
+            t.m = 1;
+            t.y += 1;
+        }
+        t.d = 1;
+    }else if(t.d < 1){
+        t.m -= 1;
+        if(t.m < 1){
+            t.m = 12;
+            t.y -= 1;
+        }
+        t.d += daysInMonth(t.y, t.m);
+    }
+    return t;
+}
 
 // -360～+360°の角度を-180°～+180°に変換する
 static double deg_range180(double x)
@@ -224,6 +289,17 @@ static void onCommandLonTime()
     int d = bleCommand.lonTime.day;
     int h = bleCommand.lonTime.hour;
     int n = bleCommand.lonTime.min;
+    int tz = bleCommand.lonTime.timezone;
+
+    DateTime utc = {y, m, d, h, n};
+    DateTime localTime = utc2local(utc, tz); 
+
+    DEBUG_PRINT("UTC %d/%02d/%02d %02d:%02d %d\n", y, m, d, h, n, tz);
+    DEBUG_PRINT("Local %d/%02d/%02d %02d:%02d\n", localTime.y, localTime.m, localTime.d, localTime.h, localTime.n);
+
+//    ui.setLongitude(lon);
+//    ui.setDate(localTime.y, localTime.m, localTime.d);
+//    ui.setTime(localTime.h, localTime.n);
 
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
@@ -266,12 +342,27 @@ static void onCommandLonTime()
     motor2.rotateT(d_theta2, T);
 }
 
+// 接続時
+static void onConnected()
+{
+//    ui.setConnected(true);
+}
+
+// 切断時
+static void onDisconnected()
+{
+//    ui.setConnected(false);
+}
+
 // 初期化
 void setup()
 {
     Serial.begin(115200);
+
+//    ui.begin();
+
 #if 1
-    while(!Serial);
+    //while(!Serial);
     delay(100);
     Serial.println("Start!");
 #endif
@@ -296,6 +387,8 @@ void setup()
     bleCommand.onCommandDemo1      = onCommandDemo1;
     bleCommand.onCommandDemo2      = onCommandDemo2;
     bleCommand.onCommandLonTime    = onCommandLonTime;
+    bleCommand.onConnected         = onConnected;
+    bleCommand.onDisconnected      = onDisconnected;
     bleCommand.begin();
 
     // 初期位置出し(太陽が春分点で南中)
@@ -307,6 +400,9 @@ void loop()
 {
     // BLEタスク
     bleCommand.task();
+
+    // UIタスク
+//    ui.task();
 
     // モータがアイドル状態かチェック
     static bool motors_idle_old = true;

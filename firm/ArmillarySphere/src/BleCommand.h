@@ -10,6 +10,7 @@ struct LonTime
     uint8_t     day;
     uint8_t     hour;
     uint8_t     min;
+    int8_t      timezone;
 };
 
 // BLEコマンド制御クラス
@@ -27,6 +28,9 @@ public:
     void (*onCommandDemo1)();
     void (*onCommandDemo2)();
     void (*onCommandLonTime)();
+
+    void (*onConnected)();
+    void (*onDisconnected)();
     
     LonTime lonTime;
     
