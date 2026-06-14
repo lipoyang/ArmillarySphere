@@ -83,7 +83,7 @@ let canvas_isTouched = false; // タッチ中フラグ
 // 読み込み時の処理
 window.onload = function()
 {
-  //draw_canvas();
+  draw_canvas();
 }
 
 // キャンバス描画
@@ -223,6 +223,7 @@ text_datetime.addEventListener('change', function (e) {
 select_timezone.addEventListener('change', function (e) {
   show_timezone();
   calc_sun_pos();
+  moveArmillarySphere();
 });
 // 経度・緯度が変更されたとき
 select_latitude.addEventListener('change', function (e) {
@@ -232,6 +233,7 @@ select_latitude.addEventListener('change', function (e) {
 select_longitude.addEventListener('change', function (e) {
   show_location();
   calc_sun_pos();
+  moveArmillarySphere();
 });
 number_latitude.addEventListener('change', function (e) {
   show_location();
@@ -240,6 +242,7 @@ number_latitude.addEventListener('change', function (e) {
 number_longitude.addEventListener('change', function (e) {
   show_location();
   calc_sun_pos();
+  moveArmillarySphere();
 });
 
 // 接続ボタン
@@ -883,8 +886,10 @@ async function moveArmillarySphere()
     await sendLonTime(
       longitude,
       utc_datetime.year, utc_datetime.month, utc_datetime.day,
-      utc_datetime.hour, utc_datetime.min
-    ).catch(()=>{
+      utc_datetime.hour, utc_datetime.min,
+      timezone
+    ).catch((error)=>{
+      // console.error(error);
       // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
       if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
       pending= true; // 保留セット
@@ -904,10 +909,10 @@ async function sendCommand(command) {
 }
 
 // 経度とUTC日時の送信
-async function sendLonTime(longitude, year, month, day, hour, min) {
+async function sendLonTime(longitude, year, month, day, hour, min, timezone) {
   if(bleDevice == null) return;
 
-  const aBuffer = new ArrayBuffer(10);
+  const aBuffer = new ArrayBuffer(11);
   const dView = new DataView(aBuffer);
   const LITTLE_ENDIAN = true;
   dView.setFloat32(0, longitude, LITTLE_ENDIAN);
@@ -916,6 +921,7 @@ async function sendLonTime(longitude, year, month, day, hour, min) {
   dView.setUint8  (7, day,       LITTLE_ENDIAN);
   dView.setUint8  (8, hour,      LITTLE_ENDIAN);
   dView.setUint8  (9, min,       LITTLE_ENDIAN);
+  dView.setInt8  (10, timezone,  LITTLE_ENDIAN);
   const bArray = new Uint8Array(aBuffer);
 
   await chrLonTime.writeValue(bArray).then(() => {
