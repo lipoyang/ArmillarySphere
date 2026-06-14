@@ -45,6 +45,8 @@ bool BaseStepper::isIdle()
 // msec: 時間[msec]
 void BaseStepper::setStepT(int step, int msec)
 {
+  if(step == 0) return;
+
   this->pos_target = this->pos_now + step;
   this->dir = (step>=0) ? 1 : -1;
   this->n = 1;
@@ -61,6 +63,9 @@ void BaseStepper::setStepT(int step, int msec)
 // sps: 速度[step/sec]
 void BaseStepper::setStepV(int step, int sps)
 {
+  if(step == 0) return;
+  if(sps == 0) return;
+
   this->pos_target = this->pos_now + step;
   this->dir = (step>=0) ? 1 : -1;
   this->n = 1;
@@ -77,6 +82,8 @@ void BaseStepper::setStepV(int step, int sps)
 // msec: 時間[msec]
 void BaseStepper::setPosT(int pos, int msec)
 {
+  if(pos == this->pos_now) return;
+
   this->pos_target = pos;
   int step = this->pos_target - this->pos_now;
   this->dir = (step>=0) ? 1 : -1;
@@ -94,6 +101,9 @@ void BaseStepper::setPosT(int pos, int msec)
 // sps: 速度[step/sec]
 void BaseStepper::setPosV(int pos, int sps)
 {
+  if(pos == this->pos_now) return;
+  if(sps == 0) return;
+
   this->pos_target = pos;
   int step = this->pos_target - this->pos_now;
   this->dir = (step>=0) ? 1 : -1;

@@ -90,10 +90,11 @@ window.onload = function()
 function draw_canvas()
 {
   // キャンバスサイスの調整
+  const divParent = document.getElementById('tab_parent');
   const divSeason = document.getElementById('tab_content1'); // 季節キャンバスのラッパ
   const divTime   = document.getElementById('tab_content2'); // 時刻キャンバスのラッパ
   // 季節キャンバス
-  const canvas_size = divSeason.offsetWidth;
+  const canvas_size = divParent.offsetWidth;
   divSeason.style.height = canvas_size + 'px';
   canvasSeason.width = canvas_size;
   canvasSeason.height = canvas_size;
@@ -202,11 +203,13 @@ canvasTime.addEventListener("touchmove",  function (e) {
 tab_season.addEventListener('shown.bs.tab', function (e) {
     panel_date_time.style.display = "block";
     panel_sun_position.style.display = "block";
+    //draw_canvas();
 });
 // タブ:時刻 が開いたとき
 tab_time.addEventListener('shown.bs.tab', function (e) {
   panel_date_time.style.display = "block";
   panel_sun_position.style.display = "block";
+  //draw_canvas();
 });
 // タブ:設定 が開いたとき
 tab_setting.addEventListener('shown.bs.tab', function (e) {
