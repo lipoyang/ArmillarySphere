@@ -2,10 +2,21 @@
 #include "DRV8825.h"
 #include "SunCalc.h"
 #include "BleCommand.h"
-//#include "M5UI.h"
+#include "M5UI.h"
 #include "Debug.h"
 
 // ピン番号
+#if 1
+// M5Stack ピン割り当て
+#define MOTOR1_DIR   2
+#define MOTOR1_STP   5
+#define MOTOR2_DIR   16
+#define MOTOR2_STP   17
+#define LED_SUN      26
+#define HALL_SENSOR1 35
+#define HALL_SENSOR2 36
+#else
+// XIAO nRF52840 ピン割り当て
 #define MOTOR1_DIR   D0
 #define MOTOR1_STP   D1
 #define MOTOR2_DIR   D2
@@ -13,6 +24,7 @@
 #define LED_SUN      D8
 #define HALL_SENSOR1 D9
 #define HALL_SENSOR2 D10
+#endif
 
 // 1ステップ=5.625°= 360°/64, ギア比1/32, フルステップ
 #define STEP_PER_REV (64*32*1)
@@ -37,7 +49,7 @@ SunCalc sun;
 BleCommand bleCommand;
 
 // M5Stack UIクラス
-// M5UI ui;
+M5UI ui;
 
 // 日時
 struct DateTime {
@@ -297,9 +309,9 @@ static void onCommandLonTime()
     DEBUG_PRINT("UTC %d/%02d/%02d %02d:%02d %d\n", y, m, d, h, n, tz);
     DEBUG_PRINT("Local %d/%02d/%02d %02d:%02d\n", localTime.y, localTime.m, localTime.d, localTime.h, localTime.n);
 
-//    ui.setLongitude(lon);
-//    ui.setDate(localTime.y, localTime.m, localTime.d);
-//    ui.setTime(localTime.h, localTime.n);
+    ui.setLongitude(lon);
+    ui.setDate(localTime.y, localTime.m, localTime.d);
+    ui.setTime(localTime.h, localTime.n);
 
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
@@ -345,13 +357,13 @@ static void onCommandLonTime()
 // 接続時
 static void onConnected()
 {
-//    ui.setConnected(true);
+    ui.setConnected(true);
 }
 
 // 切断時
 static void onDisconnected()
 {
-//    ui.setConnected(false);
+    ui.setConnected(false);
 }
 
 // 初期化
@@ -359,7 +371,7 @@ void setup()
 {
     Serial.begin(115200);
 
-//    ui.begin();
+    ui.begin();
 
 #if 1
     //while(!Serial);
@@ -402,7 +414,7 @@ void loop()
     bleCommand.task();
 
     // UIタスク
-//    ui.task();
+    ui.task();
 
     // モータがアイドル状態かチェック
     static bool motors_idle_old = true;
