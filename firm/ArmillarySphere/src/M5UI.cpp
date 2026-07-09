@@ -114,8 +114,8 @@ void M5UI::begin()
     sprite3.createSprite(320, 50);
     sprite4.createSprite(320, 50);
 
-    showDate(2026, 6, 11);
-    showTime(23, 59);
+    showDate(2026, 3, 20);
+    showTime(12, 0);
     showLongitude(135.0000);
     showStatus(opMode, connected, isSelecting);
 }

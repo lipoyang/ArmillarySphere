@@ -42,6 +42,9 @@ static double theta2 = 0.0;
 // モータの回転速度上限[deg/sec]
 const double V_MAX = 60.0;
 
+// 経度
+static float longitude = 135.0f; // 東経135度
+
 // 太陽の位置計算クラス
 SunCalc sun;
 
@@ -126,6 +129,10 @@ static void initPosition()
     bleCommand.setBusy(true);
     
     Serial.println("Motor position initializing...");
+
+    ui.setLongitude(longitude);
+    ui.setDate(2026, 3, 20);
+    ui.setTime(12, 0);
     
     int state[2]    = {0, 0};
     int position[2];
@@ -313,6 +320,8 @@ static void onCommandLonTime()
     ui.setDate(localTime.y, localTime.m, localTime.d);
     ui.setTime(localTime.h, localTime.n);
 
+    longitude = lon;
+
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
@@ -373,11 +382,9 @@ void setup()
 
     ui.begin();
 
-#if 1
     //while(!Serial);
-    delay(100);
+    //delay(100);
     Serial.println("Start!");
-#endif
 
     // モータの初期化
     motor1.begin();
