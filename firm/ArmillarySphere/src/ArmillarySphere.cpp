@@ -233,6 +233,7 @@ static void onCommandInit()
 static void onCommandStop()
 {
     Serial.println("onCommandStop");
+    ui.setMode(MODE_NORMAL);
     
     motor1.stop();
     motor2.stop();
@@ -242,6 +243,7 @@ static void onCommandStop()
 static void onCommandRotation()
 {
     Serial.println("onCommandRotation");
+    ui.setMode(MODE_ROTATION);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
@@ -257,6 +259,7 @@ static void onCommandRotation()
 static void onCommandRevolution()
 {
     Serial.println("onCommandRevolution");
+    ui.setMode(MODE_REVOLUTION);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
@@ -272,6 +275,7 @@ static void onCommandRevolution()
 static void onCommandDemo1()
 {
     Serial.println("onCommandDemo1");
+    ui.setMode(MODE_DEMO1);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
@@ -288,6 +292,7 @@ static void onCommandDemo1()
 static void onCommandDemo2()
 {
     Serial.println("onCommandDemo2");
+    ui.setMode(MODE_DEMO2);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
@@ -391,7 +396,7 @@ static void onSetMode(OpMode mode)
     case MODE_ROTATION:
         onCommandRotation();
         break;
-    case MODE_REVOLUTOIN:
+    case MODE_REVOLUTION:
         onCommandRevolution();
         break;
     case MODE_DEMO1:
