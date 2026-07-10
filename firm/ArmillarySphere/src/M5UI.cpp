@@ -74,9 +74,12 @@ static void showStatus(OpMode opMode, bool isOnline, bool isSelecting)
     const char* status;
     bool reverse;
     if(isSelecting){
-        status = OpModeStr[opMode];
+        if(opMode == MODE_NORMAL){
+            status = "STOP";
+        }else{
+            status = OpModeStr[opMode];
+        }
         reverse = true;
-        Serial.println("HOGE1");
     }else{
         if(opMode == MODE_NORMAL){
             status = (isOnline) ? "ONLINE" : "OFFLINE";
@@ -121,7 +124,7 @@ void M5UI::task()
         Serial.println("Button A pressed");
         if(isSelecting == false){
             isSelecting = true;
-            modeSelect = (int)opMode;
+            modeSelect = (int)MODE_NORMAL; // 選択は常に MODE_NORMAL から
         }else{
             modeSelect++;
             if(modeSelect >= (int)MAX_MODE) modeSelect = 0;
