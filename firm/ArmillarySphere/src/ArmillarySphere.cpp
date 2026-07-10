@@ -315,7 +315,14 @@ static bool onCommandDemo2()
 static bool onCommandLonTime()
 {
     Serial.println("onCommandLonTime");
-    
+
+    // モータのアイドル判定
+    bool motors_idle = motor1.isIdle() && motor2.isIdle();
+    if(!motors_idle){
+        Serial.println("Motor Busy");
+        return false;
+    }
+
     float lon = bleCommand.lonTime.lon;
     int y = bleCommand.lonTime.year;
     int m = bleCommand.lonTime.month;
@@ -336,13 +343,6 @@ static bool onCommandLonTime()
 
     longitude = lon;
 
-    // モータのアイドル判定
-    bool motors_idle = motor1.isIdle() && motor2.isIdle();
-    if(!motors_idle){
-        Serial.println("Motor Busy");
-        return false;
-    }
-    
     // 日時と観測地点の緯度・経度を設定して太陽の位置を計算
     sun.setDate(y, m, d, h, n, 0);
     sun.setLocation(35, lon); // 第1引数の緯度は実際には未使用
