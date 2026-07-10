@@ -133,7 +133,8 @@ static void initPosition()
     ui.setLongitude(longitude);
     ui.setDate(2026, 3, 20);
     ui.setTime(12, 0);
-    
+    ui.setMode(MODE_INIT);
+
     int state[2]    = {0, 0};
     int position[2];
     int hall[2];
@@ -209,6 +210,8 @@ static void initPosition()
         bleCommand.task();
     }
     bleCommand.setBusy(false);
+
+    ui.setMode(MODE_NORMAL);
 }
 
 // 初期位置コマンドのとき
@@ -375,12 +378,40 @@ static void onDisconnected()
     ui.setConnected(false);
 }
 
+// UIの操作でモード設定されたとき
+static void onSetMode(OpMode mode)
+{
+    switch(mode){
+    case MODE_NORMAL:
+        onCommandStop();
+        break;
+    case MODE_INIT:
+        onCommandInit();
+        break;
+    case MODE_ROTATION:
+        onCommandRotation();
+        break;
+    case MODE_REVOLUTOIN:
+        onCommandRevolution();
+        break;
+    case MODE_DEMO1:
+        onCommandDemo1();
+        break;
+    case MODE_DEMO2:
+        onCommandDemo2();
+        break;
+    default:
+        break;
+    }
+}
+
 // 初期化
 void setup()
 {
     Serial.begin(115200);
 
     ui.begin();
+    ui.onSetMode = onSetMode;
 
     //while(!Serial);
     //delay(100);

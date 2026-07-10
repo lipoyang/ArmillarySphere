@@ -8,16 +8,6 @@ static LGFX_Sprite sprite3(&M5.Display);
 static LGFX_Sprite sprite4(&M5.Display);
 
 // 動作モード
-enum OpMode
-{
-    MODE_NORMAL = 0,
-    MODE_INIT,
-    MODE_ROTATION,
-    MODE_REVOLUTOIN,
-    MODE_DEMO1,
-    MODE_DEMO2,
-    MAX_MODE
-};
 OpMode opMode = MODE_NORMAL;
 bool isSelecting = false;
 static int modeSelect;
@@ -144,6 +134,7 @@ void M5UI::task()
         if(isSelecting){
             opMode = (OpMode)modeSelect;
             isSelecting = false;
+            if (onSetMode != nullptr) onSetMode(opMode);
         }
         redraw = true;
     }
@@ -169,4 +160,13 @@ void M5UI::task()
         showLongitude(lon);
         toUpdate = false;
     }
+}
+
+void M5UI::setMode(OpMode mode)
+{
+    if(mode < MODE_NORMAL || mode >= MAX_MODE) return;
+    if(opMode == mode) return;
+
+    opMode = mode;
+    showStatus(opMode, connected, isSelecting);
 }
