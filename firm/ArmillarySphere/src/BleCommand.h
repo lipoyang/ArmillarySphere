@@ -21,13 +21,13 @@ public:
     void task();
     void setBusy(bool busy);
     
-    void (*onCommandInit)();
-    void (*onCommandStop)();
-    void (*onCommandRotation)();
-    void (*onCommandRevolution)();
-    void (*onCommandDemo1)();
-    void (*onCommandDemo2)();
-    void (*onCommandLonTime)();
+    bool (*onCommandInit)();
+    bool (*onCommandStop)();
+    bool (*onCommandRotation)();
+    bool (*onCommandRevolution)();
+    bool (*onCommandDemo1)();
+    bool (*onCommandDemo2)();
+    bool (*onCommandLonTime)();
 
     void (*onConnected)();
     void (*onDisconnected)();

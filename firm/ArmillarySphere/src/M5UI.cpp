@@ -135,9 +135,9 @@ void M5UI::task()
     if (M5.BtnB.wasPressed()) {
         Serial.println("Button B is holding");
         if(isSelecting){
-            opMode = (OpMode)modeSelect;
+            // opMode = (OpMode)modeSelect; // ここではモード変更しない
             isSelecting = false;
-            if (onSetMode != nullptr) onSetMode(opMode);
+            if (onSetMode != nullptr) onSetMode((OpMode)modeSelect); // ここでモード変更 (失敗あり)
         }
         redraw = true;
     }

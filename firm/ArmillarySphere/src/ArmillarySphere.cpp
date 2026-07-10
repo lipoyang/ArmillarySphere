@@ -215,7 +215,7 @@ static void initPosition()
 }
 
 // 初期位置コマンドのとき
-static void onCommandInit()
+static bool onCommandInit()
 {
     Serial.println("onCommandInit");
     
@@ -223,90 +223,96 @@ static void onCommandInit()
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
-        return;
+        return false;
     }
     
     initializing = true;
+    return true;
 }
 
 // 停止コマンドのとき
-static void onCommandStop()
+static bool onCommandStop()
 {
     Serial.println("onCommandStop");
     ui.setMode(MODE_NORMAL);
     
     motor1.stop();
     motor2.stop();
+    return true;
 }
 
 // 自転コマンドのとき
-static void onCommandRotation()
+static bool onCommandRotation()
 {
     Serial.println("onCommandRotation");
-    ui.setMode(MODE_ROTATION);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
-        return;
+        return false;
     }
+    ui.setMode(MODE_ROTATION);
     
     motor1.rotateV(V_MAX);
+    return true;
 }
 
 // 公転コマンドのとき
-static void onCommandRevolution()
+static bool onCommandRevolution()
 {
     Serial.println("onCommandRevolution");
-    ui.setMode(MODE_REVOLUTION);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
-        return;
+        return false;
     }
+    ui.setMode(MODE_REVOLUTION);
     
     motor2.rotateV(V_MAX);
+    return true;
 }
 
 // デモ1コマンドのとき
-static void onCommandDemo1()
+static bool onCommandDemo1()
 {
     Serial.println("onCommandDemo1");
-    ui.setMode(MODE_DEMO1);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
-        return;
+        return false;
     }
+    ui.setMode(MODE_DEMO1);
     
     motor1.rotateV(V_MAX);
     motor2.rotateV(V_MAX);
+    return true;
 }
 
 // デモ2コマンドのとき
-static void onCommandDemo2()
+static bool onCommandDemo2()
 {
     Serial.println("onCommandDemo2");
-    ui.setMode(MODE_DEMO2);
     
     // モータのアイドル判定
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
-        return;
+        return false;
     }
+    ui.setMode(MODE_DEMO2);
     
     motor1.rotateV(V_MAX);
     motor2.rotateV(V_MAX / 4);
+    return true;
 }
 
 // 経度・UTC日時の設定のとき
-static void onCommandLonTime()
+static bool onCommandLonTime()
 {
     Serial.println("onCommandLonTime");
     
@@ -334,7 +340,7 @@ static void onCommandLonTime()
     bool motors_idle = motor1.isIdle() && motor2.isIdle();
     if(!motors_idle){
         Serial.println("Motor Busy");
-        return;
+        return false;
     }
     
     // 日時と観測地点の緯度・経度を設定して太陽の位置を計算
@@ -369,6 +375,8 @@ static void onCommandLonTime()
     // モータの回転指令
     motor1.rotateT(d_theta1, T);
     motor2.rotateT(d_theta2, T);
+
+    return true;
 }
 
 // 接続時
