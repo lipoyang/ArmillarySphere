@@ -179,11 +179,13 @@ static void initPosition()
             case 1:
                 if (hall[i] == LOW){
                     state[i] = 2;
-                    int step = (motor[i]->getPos() - position[i]) / 2;
+                    //　少し戻る (メカのセッティングによって要調整)
+                  //int step = (motor[i]->getPos() - position[i]) / 2; // (追加で進んだステップ数の半分だけ戻る)
+                    int step = (motor[i]->getPos() - position[i]);
                     motor[i]->setStepV(-step, 100);
                 }
                 break;
-            // 逆転中(追加で進んだステップ数の半分だけ戻る)
+            // 逆転中(少し戻る)
             case 2:
                 if(motor[i]->isIdle()){
                     state[i] = 3;
