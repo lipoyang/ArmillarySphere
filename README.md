@@ -2,7 +2,7 @@
 ステッピングモータで動く渾天儀です。
 
 ## 解説
-* [Armillary Sphere Drive - Hackster.io](https://www.hackster.io/lipoyang/armillary-sphere-drive-933569) (準備中)
+* [Motorized Armillary Sphere - Hackster.io](https://www.hackster.io/lipoyang/motorized-armillary-sphere-933569) (英文記事)
 
 ## ファイル
 * [./app/](./app/) : Webアプリのソース (Chrome系ブラウザ対応。iOSは非対応)
