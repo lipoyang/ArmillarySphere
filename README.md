@@ -2,6 +2,7 @@
 ステッピングモータで動く渾天儀です。
 
 ## 解説
+* [動く渾天儀 | ProtoPedia](https://protopedia.net/prototype/8534) (日本語記事)
 * [Motorized Armillary Sphere - Hackster.io](https://www.hackster.io/lipoyang/motorized-armillary-sphere-933569) (英文記事)
 
 ## ファイル
