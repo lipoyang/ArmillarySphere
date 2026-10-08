@@ -4,15 +4,18 @@
 ## (1) 台
 ### (1.1) 底板に支持環を取り付ける (● M3-6mmナベネジ 仮止め)
 NE(艮)、SE(巽)、SW(坤)、NW(乾)の順に。
+
 <img src="./image/2A.jpg" alt="図2A" width="400">　<img src="./image/2B.jpg" alt="図2B" width="400">
 
 ### (1.2) 地平環に支持環を取り付ける (▼ M3-6mm低頭ネジ 仮止め)
 NE(艮)、SE(巽)、SW(坤)、NW(乾)の順に。  
 その後、(1.1) (1.2) の本締め。
+
 <img src="./image/3A.jpg" alt="図3A" width="400">　<img src="./image/3B.jpg" alt="図3B" width="400">
 
 ### (1.3) 地平環に脚を取り付ける (▼ M3-6mm低頭ネジ)
 NE(艮)、SE(巽)、SW(坤)、NW(乾)の順に。
+
 <img src="./image/4A.jpg" alt="図4A" width="400">　<img src="./image/4B.jpg" alt="図4B" width="400">
 
 ## (2) 天球
@@ -23,6 +26,7 @@ NE(艮)、SE(巽)、SW(坤)、NW(乾)の順に。
 ### (2.3) 6時(夏至)の天経環を北極環と南極環に取り付ける (● M3-6mmナベネジ 仮止め)
 ### (2.4) 12時(秋分)の天経環を北極環と南極環に取り付ける (● M3-6mmナベネジ 仮止め)
 その後、(2.2)～(2.4) の本締め。
+
 <img src="./image/6A.jpg" alt="図6A" width="400">　<img src="./image/6B.jpg" alt="図6B" width="400">
 
 ## (3) 黄道環
