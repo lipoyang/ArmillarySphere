@@ -12,6 +12,8 @@
 #define MOTOR1_STP   5
 #define MOTOR2_DIR   16
 #define MOTOR2_STP   17
+#define MOTOR1_EN    12
+#define MOTOR2_EN    13
 #define LED_SUN      26
 #define HALL_SENSOR1 35
 #define HALL_SENSOR2 36
@@ -21,6 +23,8 @@
 #define MOTOR1_STP   D1
 #define MOTOR2_DIR   D2
 #define MOTOR2_STP   D3
+#define MOTOR1_EN    D4
+#define MOTOR2_EN    D5
 #define LED_SUN      D8
 #define HALL_SENSOR1 D9
 #define HALL_SENSOR2 D10
@@ -30,8 +34,8 @@
 #define STEP_PER_REV (64*32*1)
 
 // ステッピングモータ
-DRV8825 motor1(MOTOR1_DIR, MOTOR1_STP, 1, STEP_PER_REV);
-DRV8825 motor2(MOTOR2_DIR, MOTOR2_STP, 1, STEP_PER_REV);
+DRV8825 motor1(MOTOR1_DIR, MOTOR1_STP, 1, STEP_PER_REV, MOTOR1_EN);
+DRV8825 motor2(MOTOR2_DIR, MOTOR2_STP, 1, STEP_PER_REV, MOTOR2_EN);
 
 // 初期化フラグ
 static bool initializing = false;
@@ -145,6 +149,8 @@ static void initPosition()
     hall[1] = digitalRead(HALL_SENSOR2);
     
     // もしホールセンサがHIGHなら少し逆転しておく
+    motor1.enable();
+    motor2.enable();
     if(hall[0] == HIGH) motor1.rotateT(-30, 0.5);
     if(hall[1] == HIGH) motor2.rotateT(-30, 0.5);
     while(!motor1.isIdle() || !motor2.isIdle()){
@@ -211,6 +217,9 @@ static void initPosition()
         // BLEタスクの実行 TODO
         bleCommand.task();
     }
+    motor1.disable();
+    motor2.disable();
+
     bleCommand.setBusy(false);
 
     ui.setMode(MODE_NORMAL);
@@ -240,6 +249,8 @@ static bool onCommandStop()
     
     motor1.stop();
     motor2.stop();
+    motor1.disable();
+    motor2.disable();
     return true;
 }
 
@@ -256,6 +267,7 @@ static bool onCommandRotation()
     }
     ui.setMode(MODE_ROTATION);
     
+    motor1.enable();
     motor1.rotateV(V_MAX);
     return true;
 }
@@ -273,6 +285,7 @@ static bool onCommandRevolution()
     }
     ui.setMode(MODE_REVOLUTION);
     
+    motor2.enable();
     motor2.rotateV(V_MAX);
     return true;
 }
@@ -290,6 +303,8 @@ static bool onCommandDemo1()
     }
     ui.setMode(MODE_DEMO1);
     
+    motor1.enable();
+    motor2.enable();
     motor1.rotateV(V_MAX);
     motor2.rotateV(V_MAX);
     return true;
@@ -308,6 +323,8 @@ static bool onCommandDemo2()
     }
     ui.setMode(MODE_DEMO2);
     
+    motor1.enable();
+    motor2.enable();
     motor1.rotateV(V_MAX);
     motor2.rotateV(V_MAX / 4);
     return true;
@@ -375,6 +392,8 @@ static bool onCommandLonTime()
     DEBUG_PRINT("T = %f\n", T);
     
     // モータの回転指令
+    motor1.enable();
+    motor2.enable();
     motor1.rotateT(d_theta1, T);
     motor2.rotateT(d_theta2, T);
 
@@ -470,13 +489,20 @@ void loop()
     ui.task();
 
     // モータがアイドル状態かチェック
-    static bool motors_idle_old = true;
-    bool motors_idle = motor1.isIdle() && motor2.isIdle();
-    if(motors_idle && !motors_idle_old){
-        Serial.println("Motors rotated!");
+    DRV8825 *motor[2] = {&motor1, &motor2};
+    static bool motor_idle_prev[2] = {true, true};
+    bool motors_idle[2];
+    for(int i=0; i<2; i++){
+        motors_idle[i] = motor[i]->isIdle();
+
+        if(motors_idle[i] && !motor_idle_prev[i]){
+            motor[i]->disable();
+            Serial.printf("Motor %d stopped!\n", i+1);
+        }
+        motor_idle_prev[i] = motors_idle[i];
     }
-    motors_idle_old = motors_idle;
-    bleCommand.setBusy(!motors_idle);
+    bool all_idle = motors_idle[0] && motors_idle[1];
+    bleCommand.setBusy(!all_idle);
     
     // 初期位置出し
     if(initializing){

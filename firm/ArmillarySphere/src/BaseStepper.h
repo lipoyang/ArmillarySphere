@@ -19,6 +19,8 @@ public:
     virtual void begin()                    = 0; // 初期化
     virtual void takeStep(int dir, int stp) = 0; // ステップ動作
     virtual int getTime()                   = 0; // システム時刻の取得
+    virtual void enable()                   = 0; // モータ出力有効化
+    virtual void disable()                  = 0; // モータ出力無効化
     
     // 変数の初期化
     void init();
