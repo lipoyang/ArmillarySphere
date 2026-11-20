@@ -240,6 +240,7 @@ static bool onCommandInit()
         Serial.println("Motor Busy");
         return false;
     }
+    bleCommand.setBusy(true);
     
     initializing = true;
     return true;
@@ -263,6 +264,8 @@ static bool onCommandStop()
     theta1 = motor1.getAngle();
     theta2 = motor2.getAngle();
 
+    bleCommand.setBusy(false);
+
     return true;
 }
 
@@ -277,6 +280,8 @@ static bool onCommandRotation()
         Serial.println("Motor Busy");
         return false;
     }
+    bleCommand.setBusy(true);
+
     ui.setMode(MODE_ROTATION);
     
     motor1.enable();
@@ -295,6 +300,8 @@ static bool onCommandRevolution()
         Serial.println("Motor Busy");
         return false;
     }
+    bleCommand.setBusy(true);
+
     ui.setMode(MODE_REVOLUTION);
     
     motor2.enable();
@@ -313,6 +320,8 @@ static bool onCommandDemo1()
         Serial.println("Motor Busy");
         return false;
     }
+    bleCommand.setBusy(true);
+
     ui.setMode(MODE_DEMO1);
     
     motor1.enable();
@@ -333,6 +342,8 @@ static bool onCommandDemo2()
         Serial.println("Motor Busy");
         return false;
     }
+    bleCommand.setBusy(true);
+
     ui.setMode(MODE_DEMO2);
     
     motor1.enable();
@@ -353,6 +364,7 @@ static bool onCommandLonTime()
         Serial.println("Motor Busy");
         return false;
     }
+    bleCommand.setBusy(true);
 
     float lon = bleCommand.lonTime.lon;
     int y = bleCommand.lonTime.year;
@@ -519,19 +531,16 @@ void loop()
 
     // モータがアイドル状態かチェック
     DRV8825 *motor[2] = {&motor1, &motor2};
-    static bool motor_idle_prev[2] = {true, true};
-    bool motors_idle[2];
     for(int i=0; i<2; i++){
-        motors_idle[i] = motor[i]->isIdle();
-
-        if(motors_idle[i] && !motor_idle_prev[i]){
+        if(motor[i]->isEnable() && motor[i]->isIdle()){
             motor[i]->disable();
             Serial.printf("Motor %d stopped!\n", i+1);
         }
-        motor_idle_prev[i] = motors_idle[i];
     }
-    bool all_idle = motors_idle[0] && motors_idle[1];
-    bleCommand.setBusy(!all_idle);
+    if(bleCommand.isBusy() && motor1.isIdle() && motor2.isIdle()){
+        bleCommand.setBusy(false);
+        Serial.println("Motor all stopped!");
+    }
     
     // 初期位置出し
     if(initializing){
