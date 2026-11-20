@@ -182,9 +182,9 @@ int BaseStepper::getPos()
 
 // 角度の取得
 // return: 角度[deg]
-int BaseStepper::getAngle()
+double BaseStepper::getAngle()
 {
-    return (360 * this->pos_now / SPR);
+    return (360.0 * (double)this->pos_now / (double)SPR);
 }
 
 // 位置のリセット

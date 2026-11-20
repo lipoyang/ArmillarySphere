@@ -49,7 +49,7 @@ public:
     
     // 位置の取得
     int getPos();
-    int getAngle();
+    double getAngle();
     // 位置のリセット、換算
     void resetPos();
     void modPos();
