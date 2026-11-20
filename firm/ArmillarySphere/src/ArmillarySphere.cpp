@@ -220,6 +220,10 @@ static void initPosition()
     motor1.disable();
     motor2.disable();
 
+    // モータ位置の値をゼロにリセット
+    motor1.resetPos();
+    motor2.resetPos();
+
     bleCommand.setBusy(false);
 
     ui.setMode(MODE_NORMAL);
@@ -251,6 +255,14 @@ static bool onCommandStop()
     motor2.stop();
     motor1.disable();
     motor2.disable();
+
+    // 現在のモータ位置を±180°相当の範囲に換算
+    motor1.modPos();
+    motor2.modPos();
+    // 現在のモータ位置から角度を逆算
+    theta1 = motor1.getAngle();
+    theta2 = motor2.getAngle();
+
     return true;
 }
 
@@ -439,6 +451,23 @@ static void onSetMode(OpMode mode)
     }
 }
 
+// デバッグ用のシリアル出力
+static void debugPrint()
+{
+    if(Serial.available()){
+        char c = Serial.read();
+        if(c == '1'){
+            Serial.printf("\nMotor1: theta=%7.2f, getAngle=%7.2f\n", theta1, motor1.getAngle());
+        }else if(c == '2'){
+            Serial.printf("\nMotor2: theta=%7.2f, getAngle=%7.2f\n", theta2, motor2.getAngle());
+        }else if(c == 'a'){
+            Serial.printf("\nMotor1: theta=%7.2f, getAngle=%7.2f\n", theta1, motor1.getAngle());
+            Serial.printf(  "Motor2: theta=%7.2f, getAngle=%7.2f\n", theta2, motor2.getAngle());
+        }
+        while(Serial.available()) Serial.read();
+    }
+}
+
 // 初期化
 void setup()
 {
@@ -513,4 +542,7 @@ void loop()
     // モータの制御更新
     motor1.update();
     motor2.update();
+
+    // デバッグ用
+    debugPrint();
 }
