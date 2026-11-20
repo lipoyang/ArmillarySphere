@@ -121,7 +121,7 @@ void M5UI::task()
 
     // [SELECT] ボタン
     if (M5.BtnA.wasPressed()) {
-        Serial.println("Button A pressed");
+        //Serial.println("Button A pressed");
         if(isSelecting == false){
             isSelecting = true;
             modeSelect = (int)MODE_NORMAL; // 選択は常に MODE_NORMAL から
@@ -133,7 +133,7 @@ void M5UI::task()
     }
     // [SET] ボタン
     if (M5.BtnB.wasPressed()) {
-        Serial.println("Button B is holding");
+        //Serial.println("Button B pressed");
         if(isSelecting){
             // opMode = (OpMode)modeSelect; // ここではモード変更しない
             isSelecting = false;
@@ -143,7 +143,7 @@ void M5UI::task()
     }
     // [CANCEL] ボタン
     if (M5.BtnC.wasPressed()) {
-        Serial.println("Button C released");
+        //Serial.println("Button C pressed");
         if(isSelecting){
             isSelecting = false;
         }
