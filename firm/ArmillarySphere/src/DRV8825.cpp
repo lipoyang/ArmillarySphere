@@ -39,6 +39,7 @@ void DRV8825::enable()
     if(PIN_EN != -1){
         digitalWrite(PIN_EN, LOW); // 負論理
     }
+    enabled = true;
 }
 
 // モータ出力無効化
@@ -47,4 +48,5 @@ void DRV8825::disable()
     if(PIN_EN != -1){
         digitalWrite(PIN_EN, HIGH); // 負論理
     }
+    enabled = false;
 }

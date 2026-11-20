@@ -9,6 +9,8 @@ private:
     const int PIN_DIR;  // DIRピン番号
     const int PIN_STP;  // STPピン番号
     const int PIN_EN;   // ENABLEピン番号 (負論理)
+
+    bool enabled = false; // モータ出力有効化されているか？
     
 public:
     // コンストラクタ
@@ -21,4 +23,5 @@ public:
     int getTime();                   // システム時刻の取得
     void enable();                   // モータ出力有効化
     void disable();                  // モータ出力無効化
+    bool isEnable(){return enabled;} // モータ出力有効化されているか？
 };

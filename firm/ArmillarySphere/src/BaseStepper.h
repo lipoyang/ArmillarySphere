@@ -21,6 +21,7 @@ public:
     virtual int getTime()                   = 0; // システム時刻の取得
     virtual void enable()                   = 0; // モータ出力有効化
     virtual void disable()                  = 0; // モータ出力無効化
+    virtual bool isEnable()                 = 0; // モータ出力有効化されているか？
     
     // 変数の初期化
     void init();
