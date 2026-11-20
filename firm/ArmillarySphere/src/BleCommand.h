@@ -20,6 +20,7 @@ public:
     void begin();
     void task();
     void setBusy(bool busy);
+    bool isBusy(){return _busy;}
     
     bool (*onCommandInit)();
     bool (*onCommandStop)();
@@ -37,4 +38,5 @@ public:
 private:
     BLEDevice central;
     bool isConnected;
+    bool _busy = false;
 };

@@ -172,4 +172,5 @@ void BleCommand::setBusy(bool busy)
     }else{
         chrBusy.writeValue(0);
     }
+    _busy = busy;
 }
