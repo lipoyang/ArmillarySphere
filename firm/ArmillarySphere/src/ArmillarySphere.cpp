@@ -127,6 +127,14 @@ static double deg_range180(double x)
     return x;
 }
 
+// 任意の角度を0°～360°に変換する
+static double deg_mod360(double x)
+{
+    x = fmod(x, 360.0);
+    if(x < 0.0) x += 360.0;
+    return x;
+}
+
 // 初期位置出し(太陽が春分点で南中)
 static void initPosition()
 {
@@ -257,7 +265,7 @@ static bool onCommandStop()
     motor1.disable();
     motor2.disable();
 
-    // 現在のモータ位置を±180°相当の範囲に換算
+    // 現在のモータ位置を0～360°相当の範囲に換算
     motor1.modPos();
     motor2.modPos();
     // 現在のモータ位置から角度を逆算
@@ -469,12 +477,12 @@ static void debugPrint()
     if(Serial.available()){
         char c = Serial.read();
         if(c == '1'){
-            Serial.printf("\nMotor1: theta=%7.2f, getAngle=%7.2f\n", theta1, motor1.getAngle());
+            Serial.printf("\nMotor1: theta=%7.2f, getAngle=%7.2f\n", theta1, deg_mod360(motor1.getAngle()));
         }else if(c == '2'){
-            Serial.printf("\nMotor2: theta=%7.2f, getAngle=%7.2f\n", theta2, motor2.getAngle());
+            Serial.printf("\nMotor2: theta=%7.2f, getAngle=%7.2f\n", theta2, deg_mod360(motor2.getAngle()));
         }else if(c == 'a'){
-            Serial.printf("\nMotor1: theta=%7.2f, getAngle=%7.2f\n", theta1, motor1.getAngle());
-            Serial.printf(  "Motor2: theta=%7.2f, getAngle=%7.2f\n", theta2, motor2.getAngle());
+            Serial.printf("\nMotor1: theta=%7.2f, getAngle=%7.2f\n", theta1, deg_mod360(motor1.getAngle()));
+            Serial.printf(  "Motor2: theta=%7.2f, getAngle=%7.2f\n", theta2, deg_mod360(motor2.getAngle()));
         }
         while(Serial.available()) Serial.read();
     }

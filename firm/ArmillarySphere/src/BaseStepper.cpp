@@ -195,11 +195,12 @@ void BaseStepper::resetPos()
     infinit = false;
 }
 
-// 位置の換算 (±180°に相当する範囲の値に)
+// 位置の換算 (0～360°に相当する範囲の値に)
 void BaseStepper::modPos()
 {
     pos_now = pos_now % SPR;
-    if (pos_now > (SPR/2)) pos_now -= SPR;
+    if(pos_now < 0) pos_now += SPR;
+    // if (pos_now > (SPR/2)) pos_now -= SPR;
     pos_target = pos_now;
     infinit = false;
 }
