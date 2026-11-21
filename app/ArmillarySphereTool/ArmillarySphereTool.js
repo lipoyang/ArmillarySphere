@@ -72,6 +72,9 @@ const MY_RED        = '#dc3545';
 // キャンバス
 let canvas_R = 0;             // 内接円の半径
 
+// UI用のバックアップ変数
+let _timezone = 0;
+
 /********** 初期化処理 ***********/
 
 // 読み込み時の処理
@@ -111,6 +114,7 @@ function draw_canvas()
 
   // タイムゾーン
   const timezone = 9; // UTC+9 (JST)
+  _timezone = timezone;
   select_timezone.options[12 - timezone].selected = true;
   show_timezone();
   // 緯度・経度
@@ -196,29 +200,49 @@ text_datetime.addEventListener('change', function (e) {
 });
 
 // タイムゾーンが変更されたとき
-select_timezone.addEventListener('change', function (e) {
-  show_timezone();
-  calc_sun_pos();
-  moveArmillarySphere();
+select_timezone.addEventListener('change', async function (e) {
+  console.log("timezone=" + select_timezone.value); // TODO
+
+  const busy = await readBusy();
+  if(!busy){
+    _timezone = Number(select_timezone.value);
+    show_timezone();
+    calc_sun_pos();
+    moveArmillarySphere();
+  }else{
+    error_toast("渾天儀が動作中です。");
+    // 元に戻す
+    select_timezone.options[12 - _timezone].selected = true;
+  }
 });
 // 経度・緯度が変更されたとき
 select_latitude.addEventListener('change', function (e) {
   show_location();
-  calc_sun_pos();
+//calc_sun_pos(); // 緯度の変更は現状の渾天儀には影響しないので、ここでは計算しない 
 });
-select_longitude.addEventListener('change', function (e) {
-  show_location();
-  calc_sun_pos();
-  moveArmillarySphere();
+select_longitude.addEventListener('change', async function (e) {
+  const busy = await readBusy();
+  if(!busy){
+    show_location();
+    calc_sun_pos();
+    moveArmillarySphere();
+  }else{
+    error_toast("渾天儀が動作中です。");
+  }
 });
 number_latitude.addEventListener('change', function (e) {
   show_location();
-  calc_sun_pos();
+//calc_sun_pos(); // 緯度の変更は現状の渾天儀には影響しないので、ここでは計算しない 
 });
-number_longitude.addEventListener('change', function (e) {
-  show_location();
-  calc_sun_pos();
-  moveArmillarySphere();
+number_longitude.addEventListener('change', async function (e) {
+  const busy = await readBusy();
+  if(!busy){
+    show_location();
+    calc_sun_pos();
+    moveArmillarySphere();
+  }else{
+    error_toast("渾天儀が動作中です。");
+  }
 });
 
 // 接続ボタン
@@ -553,14 +577,9 @@ function canvasSeason_button(e) {
       if(i == 1) set_date_summer_solstice();  // 夏至
       if(i == 2) set_date_autumn_equinox();   // 秋分
       if(i == 3) set_date_winter_solstice();  // 冬至
+
+      // 春分・夏至・秋分・冬至の日付が単純な計算でないため、ここで日時変更の処理を使う
       datetime_onchanged();
-/*
-      const th = i * Math.PI / 2;
-      // 太陽を表示
-      draw_sun(th);
-      // 角度から日付を表示
-      theta_to_date(th);
-*/
     }
   }
 }
