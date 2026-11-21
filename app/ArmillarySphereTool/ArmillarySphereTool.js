@@ -62,10 +62,10 @@ let chrCommand;    // コマンド
 let chrLonTime;    // 経度とUTC日時の設定
 let chrBusy;       // ビジー状態か？
 
-let last_time = 0;    // 前回送信時刻
-let pending = false;  // 送信保留フラグ
-const SEND_INTERVAL = 50; // [msec] これ未満の間隔での送信は保留する
-const SEND_DELAY    = 50; // [msec] これだけ待って再送信する  
+// let last_time = 0;    // 前回送信時刻
+// let pending = false;  // 送信保留フラグ
+// const SEND_INTERVAL = 50; // [msec] これ未満の間隔での送信は保留する
+// const SEND_DELAY    = 50; // [msec] これだけ待って再送信する  
 
 /********** その他の定数・変数 ***********/
 
@@ -76,7 +76,7 @@ const MY_RED        = '#dc3545';
 
 // キャンバス
 let canvas_R = 0;             // 内接円の半径
-let canvas_isTouched = false; // タッチ中フラグ
+//let canvas_isTouched = false; // タッチ中フラグ
 
 /********** 初期化処理 ***********/
 
@@ -134,10 +134,16 @@ function draw_canvas()
 /********** UIのイベントハンドラ ***********/
 
 // 季節キャンバス(ホロスコープ)のマウス/タッチイベント
-canvasSeason.addEventListener("mousedown", function (e) {
-  canvas_isTouched = true;
-  canvasSeason_zodiac(e);
-  canvasSeason_button(e); // --- ボタン処理も mousedown で ---
+canvasSeason.addEventListener("mousedown", async function (e) {
+//canvas_isTouched = true;
+  const busy = await readBusy();
+  console.log("mousedown busy=" + busy);
+  if(!busy){
+    canvasSeason_zodiac(e);
+    canvasSeason_button(e); // --- ボタン処理も mousedown で ---
+  }else{
+    error_toast("渾天儀が動作中です。");
+  }
 }); 
 /* --- mousedown しかとらない ---
 canvasSeason.addEventListener("mouseup", function (e) {
@@ -151,11 +157,16 @@ canvasSeason.addEventListener("mousemove", function (e) {
   }
 }); 
 */
-canvasSeason.addEventListener("touchstart",  function (e) {
-  touch2mouse(e);
-  canvas_isTouched = true;
-  canvasSeason_zodiac(e);
-  canvasSeason_button(e); // --- ボタン処理も touchstart で ---
+canvasSeason.addEventListener("touchstart",  async function (e) {
+  const busy = await readBusy();
+  if(!busy){
+    touch2mouse(e);
+  //canvas_isTouched = true;
+    canvasSeason_zodiac(e);
+    canvasSeason_button(e); // --- ボタン処理も touchstart で ---
+  }else{
+    error_toast("渾天儀が動作中です。");
+  }
 }); 
 /* --- touchstart しかとらない ---
 canvasSeason.addEventListener("touchend" ,  function (e) {
@@ -173,10 +184,15 @@ canvasSeason.addEventListener("touchmove",  function (e) {
 */
 
 // 時刻キャンバス(時計)のマウス/タッチイベント
-canvasTime.addEventListener("mousedown", function (e) {
-  canvas_isTouched = true;
-  canvasTime_clock(e);
-  canvasTime_button(e); // --- ボタン処理も mousedown で ---
+canvasTime.addEventListener("mousedown", async function (e) {
+//canvas_isTouched = true;
+  const busy = await readBusy();
+  if(!busy){
+    canvasTime_clock(e);
+    canvasTime_button(e); // --- ボタン処理も mousedown で ---
+  }else{
+    error_toast("渾天儀が動作中です。");
+  }
 }); 
 /* --- mousedown しかとらない ---
 canvasTime.addEventListener("mouseup", function (e) {
@@ -190,11 +206,16 @@ canvasTime.addEventListener("mousemove", function (e) {
   }
 }); 
 */ 
-canvasTime.addEventListener("touchstart",  function (e) {
-  touch2mouse(e);
-  canvas_isTouched = true;
-  canvasTime_clock(e);
-  canvasTime_button(e); // --- ボタン処理も touchstart で ---
+canvasTime.addEventListener("touchstart", async function (e) {
+  const busy = await readBusy();
+  if(!busy){
+    touch2mouse(e);
+  //canvas_isTouched = true;
+    canvasTime_clock(e);
+    canvasTime_button(e); // --- ボタン処理も touchstart で ---
+  }else{
+    error_toast("渾天儀が動作中です。");
+  }
 }); 
 /* --- touchstart しかとらない ---
 canvasTime.addEventListener("touchend" ,  function (e) {
@@ -305,9 +326,8 @@ btn_disconnect.addEventListener('click', async function () {
 
 // 初期位置ボタン
 btn_init.addEventListener('click', async function () {
-  //const busy = await readBusy();
-  //if(!busy)
-  sendCommand(CMD_INIT);
+  const busy = await readBusy();
+  if(!busy) sendCommand(CMD_INIT);
 });
 
 // 停止ボタン
@@ -317,30 +337,26 @@ btn_stop.addEventListener('click', async function () {
 
 // 自転ボタン
 btn_rotation.addEventListener('click', async function () {
-  //const busy = await readBusy();
-  //if(!busy)
-  sendCommand(CMD_ROTATION);
+  const busy = await readBusy();
+  if(!busy) sendCommand(CMD_ROTATION);
 });
 
 // 公転ボタン
 btn_revolution.addEventListener('click', async function () {
-  //const busy = await readBusy();
-  //if(!busy)
-  sendCommand(CMD_REVOLUTOIN);
+  const busy = await readBusy();
+  if(!busy) sendCommand(CMD_REVOLUTOIN);
 });
 
 // デモ1ボタン
 btn_demo1.addEventListener('click', async function () {
-  //const busy = await readBusy();
-  //if(!busy)
-  sendCommand(CMD_DEMO1);
+  const busy = await readBusy();
+  if(!busy) sendCommand(CMD_DEMO1);
 });
 
 // デモ2ボタン
 btn_demo2.addEventListener('click', async function () {
-  //const busy = await readBusy();
-  //if(!busy)
-  sendCommand(CMD_DEMO2);
+  const busy = await readBusy();
+  if(!busy) sendCommand(CMD_DEMO2);
 });
 
 /********** BLEのイベントハンドラ ***********/
@@ -876,40 +892,36 @@ async function moveArmillarySphere()
   if(bleDevice == null) return;
 
   // 前回送信からSEND_INTERVAL[ms]未満なら送信保留
-  const now = Date.now();
-  const elapsed = now - last_time;
-  if(elapsed < SEND_INTERVAL){
+//  const now = Date.now();
+//  const elapsed = now - last_time;
+//  if(elapsed < SEND_INTERVAL){
+//    // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
+//    if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
+//    pending= true; // 保留セット
+//    return;
+//  }
+//  last_time = now;
+//  pending = false; // 保留クリア
+
+  // 経度とUTC日時
+  const longitude = Number(number_longitude.value);
+  const timezone = Number(select_timezone.value);
+  const local_datetime = datetime_get();
+  const utc_datetime = utc_datetime_get(local_datetime, timezone);
+
+  // 送信
+  await sendLonTime(
+    longitude,
+    utc_datetime.year, utc_datetime.month, utc_datetime.day,
+    utc_datetime.hour, utc_datetime.min,
+    timezone
+  ).catch((error)=>{
+    error_toast('送信エラー');
+    // console.error(error);
     // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
-    if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
-    pending= true; // 保留セット
-    return;
-  }
-  last_time = now;
-  pending = false; // 保留クリア
-
-  // Busy確認
-  //const busy = await readBusy();
-  //if(!busy)
-  {
-    // 経度とUTC日時
-    const longitude = Number(number_longitude.value);
-    const timezone = Number(select_timezone.value);
-    const local_datetime = datetime_get();
-    const utc_datetime = utc_datetime_get(local_datetime, timezone);
-
-    // 送信
-    await sendLonTime(
-      longitude,
-      utc_datetime.year, utc_datetime.month, utc_datetime.day,
-      utc_datetime.hour, utc_datetime.min,
-      timezone
-    ).catch((error)=>{
-      // console.error(error);
-      // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
-      if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
-      pending= true; // 保留セット
-    });
-  }
+//  if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
+//  pending= true; // 保留セット
+  });
 }
 
 // コマンドの送信
@@ -950,9 +962,9 @@ async function sendLonTime(longitude, year, month, day, hour, min, timezone) {
 
 // Busy状態確認
 async function readBusy(){
-  if(bleDevice == null) return;
+  if(bleDevice == null) return true;
 
-  await chrBusy.readValue().then(value => {
+  return await chrBusy.readValue().then(value => {
     const busy = value.getUint8(0);
     console.log("chrBusy = " + busy);
     if(busy != 0){
@@ -961,7 +973,7 @@ async function readBusy(){
       return false;
     }
   }).catch((error)=>{
-    // console.error("Bluetooth Read Error:", error);
+    console.error("Bluetooth Read Error:", error);
     // error_toast('ERROR! chrBusy');
     return true;
   });
