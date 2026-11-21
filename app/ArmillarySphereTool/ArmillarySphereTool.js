@@ -74,6 +74,8 @@ let canvas_R = 0;             // 内接円の半径
 
 // UI用のバックアップ変数
 let _timezone = 0;
+let _longitude = "";
+let _east_west = 0;
 
 /********** 初期化処理 ***********/
 
@@ -122,8 +124,10 @@ function draw_canvas()
   select_latitude.options[north_south].selected = true;
   number_latitude.value = '35.6894';
   const east_west = 0; // 東経
+  _east_west = east_west;
   select_longitude.options[east_west].selected = true;
   number_longitude.value = '139.6917';
+  _longitude = number_longitude.value;
   show_location();
   // 太陽の位置の計算
   calc_sun_pos();
@@ -201,8 +205,7 @@ text_datetime.addEventListener('change', function (e) {
 
 // タイムゾーンが変更されたとき
 select_timezone.addEventListener('change', async function (e) {
-  console.log("timezone=" + select_timezone.value); // TODO
-
+//console.log("timezone=" + select_timezone.value);
   const busy = await readBusy();
   if(!busy){
     _timezone = Number(select_timezone.value);
@@ -221,13 +224,17 @@ select_latitude.addEventListener('change', function (e) {
 //calc_sun_pos(); // 緯度の変更は現状の渾天儀には影響しないので、ここでは計算しない 
 });
 select_longitude.addEventListener('change', async function (e) {
+//console.log("east_west=" + select_longitude.selectedIndex);
   const busy = await readBusy();
   if(!busy){
+    _east_west = select_longitude.selectedIndex;
     show_location();
     calc_sun_pos();
     moveArmillarySphere();
   }else{
     error_toast("渾天儀が動作中です。");
+    // 元に戻す
+    select_longitude.options[_east_west].selected = true;
   }
 });
 number_latitude.addEventListener('change', function (e) {
@@ -235,13 +242,17 @@ number_latitude.addEventListener('change', function (e) {
 //calc_sun_pos(); // 緯度の変更は現状の渾天儀には影響しないので、ここでは計算しない 
 });
 number_longitude.addEventListener('change', async function (e) {
+//console.log("longitude=" + number_longitude.value);
   const busy = await readBusy();
   if(!busy){
+    _longitude = number_longitude.value;
     show_location();
     calc_sun_pos();
     moveArmillarySphere();
   }else{
     error_toast("渾天儀が動作中です。");
+    // 元に戻す
+    number_longitude.value = _longitude;
   }
 });
 
@@ -851,7 +862,8 @@ async function moveArmillarySphere()
   if(bleDevice == null) return;
 
   // 経度とUTC日時
-  const longitude = Number(number_longitude.value);
+  const lon_sign = select_longitude.options[0].selected ? 1 : -1; // 東経:1, 西経:-1
+  const longitude = lon_sign * Number(number_longitude.value);
   const timezone = Number(select_timezone.value);
   const local_datetime = datetime_get();
   const utc_datetime = utc_datetime_get(local_datetime, timezone);
@@ -926,7 +938,8 @@ async function readBusy(){
 function calc_sun_pos()
 {
     // 経度とUTC日時
-    const longitude = Number(number_longitude.value);
+    const lon_sign = select_longitude.options[0].selected ? 1 : -1; // 東経:1, 西経:-1
+    const longitude = lon_sign * Number(number_longitude.value);
     const timezone = Number(select_timezone.value);
     const local_datetime = datetime_get();
     const utc_datetime = utc_datetime_get(local_datetime, timezone);
