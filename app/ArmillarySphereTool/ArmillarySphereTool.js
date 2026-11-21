@@ -62,11 +62,6 @@ let chrCommand;    // コマンド
 let chrLonTime;    // 経度とUTC日時の設定
 let chrBusy;       // ビジー状態か？
 
-// let last_time = 0;    // 前回送信時刻
-// let pending = false;  // 送信保留フラグ
-// const SEND_INTERVAL = 50; // [msec] これ未満の間隔での送信は保留する
-// const SEND_DELAY    = 50; // [msec] これだけ待って再送信する  
-
 /********** その他の定数・変数 ***********/
 
 // 色
@@ -76,7 +71,6 @@ const MY_RED        = '#dc3545';
 
 // キャンバス
 let canvas_R = 0;             // 内接円の半径
-//let canvas_isTouched = false; // タッチ中フラグ
 
 /********** 初期化処理 ***********/
 
@@ -135,7 +129,6 @@ function draw_canvas()
 
 // 季節キャンバス(ホロスコープ)のマウス/タッチイベント
 canvasSeason.addEventListener("mousedown", async function (e) {
-//canvas_isTouched = true;
   const busy = await readBusy();
   console.log("mousedown busy=" + busy);
   if(!busy){
@@ -145,47 +138,20 @@ canvasSeason.addEventListener("mousedown", async function (e) {
     error_toast("渾天儀が動作中です。");
   }
 }); 
-/* --- mousedown しかとらない ---
-canvasSeason.addEventListener("mouseup", function (e) {
-  canvas_isTouched = false;
-  canvasSeason_zodiac(e);
-  canvasSeason_button(e);
-}); 
-canvasSeason.addEventListener("mousemove", function (e) {
-  if(canvas_isTouched){
-    canvasSeason_zodiac(e);
-  }
-}); 
-*/
+
 canvasSeason.addEventListener("touchstart",  async function (e) {
   const busy = await readBusy();
   if(!busy){
     touch2mouse(e);
-  //canvas_isTouched = true;
     canvasSeason_zodiac(e);
     canvasSeason_button(e); // --- ボタン処理も touchstart で ---
   }else{
     error_toast("渾天儀が動作中です。");
   }
 }); 
-/* --- touchstart しかとらない ---
-canvasSeason.addEventListener("touchend" ,  function (e) {
-  touch2mouse(e);
-  canvas_isTouched = false;
-  canvasSeason_zodiac(e);
-  canvasSeason_button(e);
-}); 
-canvasSeason.addEventListener("touchmove",  function (e) {
-  touch2mouse(e);
-  if(canvas_isTouched){
-    canvasSeason_zodiac(e);
-  }
-});
-*/
 
 // 時刻キャンバス(時計)のマウス/タッチイベント
 canvasTime.addEventListener("mousedown", async function (e) {
-//canvas_isTouched = true;
   const busy = await readBusy();
   if(!busy){
     canvasTime_clock(e);
@@ -194,43 +160,17 @@ canvasTime.addEventListener("mousedown", async function (e) {
     error_toast("渾天儀が動作中です。");
   }
 }); 
-/* --- mousedown しかとらない ---
-canvasTime.addEventListener("mouseup", function (e) {
-  canvas_isTouched = false;
-  canvasTime_clock(e);
-  canvasTime_button(e);
-}); 
-canvasTime.addEventListener("mousemove", function (e) {
-  if(canvas_isTouched){
-    canvasTime_clock(e);
-  }
-}); 
-*/ 
+
 canvasTime.addEventListener("touchstart", async function (e) {
   const busy = await readBusy();
   if(!busy){
     touch2mouse(e);
-  //canvas_isTouched = true;
     canvasTime_clock(e);
     canvasTime_button(e); // --- ボタン処理も touchstart で ---
   }else{
     error_toast("渾天儀が動作中です。");
   }
 }); 
-/* --- touchstart しかとらない ---
-canvasTime.addEventListener("touchend" ,  function (e) {
-  touch2mouse(e);
-  canvas_isTouched = false;
-  canvasTime_clock(e);
-  canvasTime_button(e);
-}); 
-canvasTime.addEventListener("touchmove",  function (e) {
-  touch2mouse(e);
-  if(canvas_isTouched){
-    canvasTime_clock(e);
-  }
-}); 
-*/
 
 // タブ:季節 が開いたとき
 tab_season.addEventListener('shown.bs.tab', function (e) {
@@ -891,18 +831,6 @@ async function moveArmillarySphere()
 {
   if(bleDevice == null) return;
 
-  // 前回送信からSEND_INTERVAL[ms]未満なら送信保留
-//  const now = Date.now();
-//  const elapsed = now - last_time;
-//  if(elapsed < SEND_INTERVAL){
-//    // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
-//    if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
-//    pending= true; // 保留セット
-//    return;
-//  }
-//  last_time = now;
-//  pending = false; // 保留クリア
-
   // 経度とUTC日時
   const longitude = Number(number_longitude.value);
   const timezone = Number(select_timezone.value);
@@ -917,10 +845,6 @@ async function moveArmillarySphere()
     timezone
   ).catch((error)=>{
     error_toast('送信エラー');
-    // console.error(error);
-    // 既に保留中でなければ、SEND_DELAY[ms]後にリトライ予約
-//  if(pending == false) setTimeout(moveArmillarySphere, SEND_DELAY);
-//  pending= true; // 保留セット
   });
 }
 
