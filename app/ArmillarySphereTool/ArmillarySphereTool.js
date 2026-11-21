@@ -137,7 +137,9 @@ function draw_canvas()
 canvasSeason.addEventListener("mousedown", function (e) {
   canvas_isTouched = true;
   canvasSeason_zodiac(e);
+  canvasSeason_button(e); // --- ボタン処理も mousedown で ---
 }); 
+/* --- mousedown しかとらない ---
 canvasSeason.addEventListener("mouseup", function (e) {
   canvas_isTouched = false;
   canvasSeason_zodiac(e);
@@ -148,11 +150,14 @@ canvasSeason.addEventListener("mousemove", function (e) {
     canvasSeason_zodiac(e);
   }
 }); 
+*/
 canvasSeason.addEventListener("touchstart",  function (e) {
   touch2mouse(e);
   canvas_isTouched = true;
   canvasSeason_zodiac(e);
+  canvasSeason_button(e); // --- ボタン処理も touchstart で ---
 }); 
+/* --- touchstart しかとらない ---
 canvasSeason.addEventListener("touchend" ,  function (e) {
   touch2mouse(e);
   canvas_isTouched = false;
@@ -165,12 +170,15 @@ canvasSeason.addEventListener("touchmove",  function (e) {
     canvasSeason_zodiac(e);
   }
 });
+*/
 
 // 時刻キャンバス(時計)のマウス/タッチイベント
 canvasTime.addEventListener("mousedown", function (e) {
   canvas_isTouched = true;
   canvasTime_clock(e);
+  canvasTime_button(e); // --- ボタン処理も mousedown で ---
 }); 
+/* --- mousedown しかとらない ---
 canvasTime.addEventListener("mouseup", function (e) {
   canvas_isTouched = false;
   canvasTime_clock(e);
@@ -181,11 +189,14 @@ canvasTime.addEventListener("mousemove", function (e) {
     canvasTime_clock(e);
   }
 }); 
+*/ 
 canvasTime.addEventListener("touchstart",  function (e) {
   touch2mouse(e);
   canvas_isTouched = true;
   canvasTime_clock(e);
+  canvasTime_button(e); // --- ボタン処理も touchstart で ---
 }); 
+/* --- touchstart しかとらない ---
 canvasTime.addEventListener("touchend" ,  function (e) {
   touch2mouse(e);
   canvas_isTouched = false;
@@ -198,6 +209,7 @@ canvasTime.addEventListener("touchmove",  function (e) {
     canvasTime_clock(e);
   }
 }); 
+*/
 
 // タブ:季節 が開いたとき
 tab_season.addEventListener('shown.bs.tab', function (e) {
