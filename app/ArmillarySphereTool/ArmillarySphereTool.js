@@ -521,11 +521,13 @@ function draw_sun(rad)
   // 黄道の内側を塗りつぶす
   fillCircle(gc, 0, 0, r2, "white");
 
-  // 太陽の描画
-  const x = -r6 * Math.cos(rad);
-  const y =  r6 * Math.sin(rad);
-  strokeCircle(gc, x, y, r7, MY_RED, 2);
-  fillCircle  (gc, x, y, r8, MY_RED);
+  if(rad !== false){
+    // 太陽の描画
+    const x = -r6 * Math.cos(rad);
+    const y =  r6 * Math.sin(rad);
+    strokeCircle(gc, x, y, r7, MY_RED, 2);
+    fillCircle  (gc, x, y, r8, MY_RED);
+  }
 }
 
 // 時刻のグラフィックの表示 (時計)
@@ -591,11 +593,13 @@ function draw_clock(rad)
   fillCircle(gc, 0, 0, r7, "white");
 
   // 針の描画
-  const x1 =  r8 * Math.sin(rad);
-  const y1 = -r8 * Math.cos(rad);
-  const x2 = -r9 * Math.sin(rad);
-  const y2 =  r9 * Math.cos(rad);
-  drawLine(gc, x1, y1, x2, y2, MY_RED, 4);
+  if(rad !== false){
+    const x1 =  r8 * Math.sin(rad);
+    const y1 = -r8 * Math.cos(rad);
+    const x2 = -r9 * Math.sin(rad);
+    const y2 =  r9 * Math.cos(rad);
+    drawLine(gc, x1, y1, x2, y2, MY_RED, 4);
+  }
   fillCircle(gc, 0, 0, r10, MY_BLUE);
 }
 
@@ -1068,6 +1072,9 @@ function ui_init_position()
 // UIの不明位置表示
 function ui_invalid_position()
 {
+  draw_sun(false);
+  draw_clock(false);
+
   text_datetime.disabled = true;
 
   text_lambda.innerHTML = "---";
