@@ -76,6 +76,7 @@ let canvas_R = 0;             // 内接円の半径
 let _timezone = 0;
 let _longitude = "";
 let _east_west = 0;
+let _datetime = "";
 
 /********** 初期化処理 ***********/
 
@@ -106,6 +107,7 @@ function draw_canvas()
 
   // 日時の設定
   text_datetime.value = "2026-03-20T12:00";
+  _datetime = text_datetime.value;
 
   // 季節キャンバスの初期表示
   draw_season();
@@ -199,8 +201,17 @@ tab_setting.addEventListener('shown.bs.tab', function (e) {
 });
 
 // 日時が変更されたとき
-text_datetime.addEventListener('change', function (e) {
-  datetime_onchanged();
+text_datetime.addEventListener('change', async function (e) {
+//console.log("datetime=" + text_datetime.value);
+  const busy = await readBusy();
+  if(!busy){
+    _datetime = text_datetime.value;
+    datetime_onchanged();
+  }else{
+    error_toast("渾天儀が動作中です。");
+    // 元に戻す
+    text_datetime.value = _datetime;
+  }
 });
 
 // タイムゾーンが変更されたとき
