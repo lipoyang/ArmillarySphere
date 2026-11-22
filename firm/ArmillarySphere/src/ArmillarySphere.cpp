@@ -263,6 +263,11 @@ static bool onCommandStop()
     Serial.println("onCommandStop");
     ui.setMode(MODE_NORMAL);
     
+    bool already_idle = motor1.isIdle() && motor2.isIdle();
+    if(already_idle){
+        Serial.println("Motor already stopped");
+    }
+
     motor1.stop();
     motor2.stop();
     motor1.disable();
@@ -276,8 +281,10 @@ static bool onCommandStop()
     theta2 = motor2.getAngle();
 
     bleCommand.setBusy(false);
-    bleCommand.notifyStatus(STA_STOP);
-
+    if(!already_idle){
+        bleCommand.notifyStatus(STA_STOP);
+    }
+    
     return true;
 }
 
