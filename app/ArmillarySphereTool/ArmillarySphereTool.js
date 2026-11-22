@@ -117,6 +117,7 @@ function draw_canvas()
 
   // 日時の設定
   text_datetime.value = "2026-03-20T12:00";
+  text_datetime.disabled = false;
   _datetime = text_datetime.value;
 
   // 季節キャンバスの初期表示
@@ -216,7 +217,10 @@ text_datetime.addEventListener('change', async function (e) {
   const busy = await readBusy();
   if(!busy){
     _datetime = text_datetime.value;
+    // 日時変更処理
     datetime_onchanged();
+    // 渾天儀に指令
+    moveArmillarySphere();
   }else{
     error_toast("渾天儀が動作中です。");
     // 元に戻す
@@ -380,32 +384,30 @@ function onStatusChanged(event) {
     switch(data){
       case STA_INIT:
         console.log("通知: 初期位置出し中");
-        ui_gray_out(true);
+        ui_invalid_position();
         break;
       case STA_INIT_DONE:
         console.log("通知: 初期位置出し完了");
-        ui_gray_out(false);
         ui_init_position();
         break;
       case STA_ROTATION:
         console.log("通知: 自転");
-        ui_gray_out(true);
+        ui_invalid_position();
         break;
       case STA_REVOLUTOIN:
         console.log("通知: 公転");
-        ui_gray_out(true);
+        ui_invalid_position();
         break;
       case STA_DEMO1:
         console.log("通知:デモ1");
-        ui_gray_out(true);
+        ui_invalid_position();
         break;
       case STA_DEMO2:
         console.log("通知: デモ2");
-        ui_gray_out(true);
+        ui_invalid_position();
         break;
       case STA_STOP:
         console.log("通知: 停止");
-        ui_gray_out(false);
         ui_invalid_position();
         break;
       default:
@@ -658,6 +660,9 @@ function canvasSeason_button(e) {
 
       // 春分・夏至・秋分・冬至の日付が単純な計算でないため、ここで日時変更の処理を使う
       datetime_onchanged();
+      // 渾天儀に指令
+      moveArmillarySphere();
+      return;
     }
   }
 }
@@ -747,8 +752,6 @@ function datetime_onchanged()
 
   // 太陽の位置の計算
   calc_sun_pos();
-  // 渾天儀に指令
-  moveArmillarySphere();
 }
 
 // 日時の取得
@@ -772,6 +775,7 @@ function datetime_set(datetime) {
   const sMin   = ( '00' + datetime.min   ).slice( -2 );
   const sDateTime = sYear + "-" + sMonth + "-" + sDay + "T" + sHour + ":" + sMin;
   text_datetime.value = sDateTime;
+  text_datetime.disabled = false;
 }
 
 // UTC時刻の取得
@@ -1050,24 +1054,23 @@ function error_toast(message)
 }
 
 /********** UIの状態処理 ***********/
-// UIのグレーアウト
-function ui_gray_out(gray_out)
-{
-  if(gray_out){
-    
-  }else{
-
-  }
-}
-
 // UIの初期位置表示
 function ui_init_position()
 {
+  text_datetime.value = "2026-03-20T12:00";
+  text_datetime.disabled = false;
+  _datetime = text_datetime.value;
 
+  // 日時変更処理
+  datetime_onchanged();
 }
 
 // UIの不明位置表示
 function ui_invalid_position()
 {
+  text_datetime.disabled = true;
 
+  text_lambda.innerHTML = "---";
+  text_alpha.innerHTML  = "---";
+  text_delta.innerHTML  = "---";
 }
