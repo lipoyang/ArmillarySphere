@@ -139,6 +139,7 @@ static double deg_mod360(double x)
 static void initPosition()
 {
     bleCommand.setBusy(true);
+    bleCommand.notifyStatus(STA_INIT);
     
     Serial.println("Motor position initializing...");
 
@@ -233,6 +234,7 @@ static void initPosition()
     motor2.resetPos();
 
     bleCommand.setBusy(false);
+    bleCommand.notifyStatus(STA_INIT_DONE);
 
     ui.setMode(MODE_NORMAL);
 }
@@ -249,6 +251,7 @@ static bool onCommandInit()
         return false;
     }
     bleCommand.setBusy(true);
+//  bleCommand.notifyStatus(STA_INIT);
     
     initializing = true;
     return true;
@@ -273,6 +276,7 @@ static bool onCommandStop()
     theta2 = motor2.getAngle();
 
     bleCommand.setBusy(false);
+    bleCommand.notifyStatus(STA_STOP);
 
     return true;
 }
@@ -289,6 +293,7 @@ static bool onCommandRotation()
         return false;
     }
     bleCommand.setBusy(true);
+    bleCommand.notifyStatus(STA_ROTATION);
 
     ui.setMode(MODE_ROTATION);
     
@@ -309,6 +314,7 @@ static bool onCommandRevolution()
         return false;
     }
     bleCommand.setBusy(true);
+    bleCommand.notifyStatus(STA_REVOLUTOIN);
 
     ui.setMode(MODE_REVOLUTION);
     
@@ -329,6 +335,7 @@ static bool onCommandDemo1()
         return false;
     }
     bleCommand.setBusy(true);
+    bleCommand.notifyStatus(STA_DEMO1);
 
     ui.setMode(MODE_DEMO1);
     
@@ -351,6 +358,7 @@ static bool onCommandDemo2()
         return false;
     }
     bleCommand.setBusy(true);
+    bleCommand.notifyStatus(STA_DEMO2);
 
     ui.setMode(MODE_DEMO2);
     

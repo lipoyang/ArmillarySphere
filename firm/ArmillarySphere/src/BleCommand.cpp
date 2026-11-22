@@ -21,6 +21,8 @@ CHR_U8  chrCommand   ("2D3F5DDE-42B2-FBFA-3E3F-7673832C7DB4", BLEWrite);
 CHR_LT  chrLonTime   ("328E1678-11B5-5D34-AAD2-EF1A4A2957EB", BLERead | BLEWrite);
 // ビジー状態か？
 CHR_U8  chrBusy      ("31180989-2299-A86F-C856-B2154171C07B", BLERead);
+// 動作状態を通知
+CHR_U8  chrStatus   ("3A7B9D5C-0E6F-4A1B-8D2C-9F1A4A2957EB", BLERead | BLENotify);
 
 // コマンド定数
 const uint8_t CMD_INIT       = 0x80; // 初期位置
@@ -51,6 +53,7 @@ void BleCommand::begin()
     svcArmillarySphere.addCharacteristic(chrCommand);
     svcArmillarySphere.addCharacteristic(chrLonTime);
     svcArmillarySphere.addCharacteristic(chrBusy);
+    svcArmillarySphere.addCharacteristic(chrStatus);
     
     // サービスを追加
     BLE.addService(svcArmillarySphere);
@@ -73,6 +76,8 @@ void BleCommand::begin()
 // タスク
 void BleCommand::task()
 {
+//  BLE.poll();
+
     if(!isConnected){
         central = BLE.central();
         if (central)
@@ -173,4 +178,10 @@ void BleCommand::setBusy(bool busy)
         chrBusy.writeValue(0);
     }
     _busy = busy;
+}
+
+// 動作状態を通知
+void BleCommand::notifyStatus(uint8_t status)
+{
+    chrStatus.writeValue(status);
 }

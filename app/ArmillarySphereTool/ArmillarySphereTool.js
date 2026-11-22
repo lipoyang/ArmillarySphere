@@ -46,6 +46,7 @@ const UUID_ArmillarySphere   = "220eb65b-d64d-e553-f51e-a1048818dc96";
 const UUID_Command    = "2d3f5dde-42b2-fbfa-3e3f-7673832c7db4"; // コマンド
 const UUID_LonTime    = "328e1678-11b5-5d34-aad2-ef1a4a2957eb"; // 経度とUTC日時を設定
 const UUID_Busy       = "31180989-2299-a86f-c856-b2154171c07b"; // ビジー状態か？
+const UUID_Status     = "3a7b9d5c-0e6f-4a1b-8d2c-9f1a4a2957eb"; // 動作状態の通知
 // コマンド
 const CMD_INIT       = 0x80; // 初期位置
 const CMD_STOP       = 0x81; // 停止
@@ -53,6 +54,14 @@ const CMD_ROTATION   = 0x82; // 自転
 const CMD_REVOLUTOIN = 0x83; // 公転
 const CMD_DEMO1      = 0x84; // デモ1
 const CMD_DEMO2      = 0x85; // デモ2
+// 状態通知
+const STA_INIT       = 0x80; // 初期位置出し
+const STA_STOP       = 0x81; // 停止
+const STA_ROTATION   = 0x82; // 自転
+const STA_REVOLUTOIN = 0x83; // 公転
+const STA_DEMO1      = 0x84; // デモ1
+const STA_DEMO2      = 0x85; // デモ2
+const STA_INIT_DONE  = 0x86; // 初期位置出し完了
 
 /********** BLEの変数 ***********/
 // BLEデバイス
@@ -61,6 +70,7 @@ let bleDevice = null;
 let chrCommand;    // コマンド
 let chrLonTime;    // 経度とUTC日時の設定
 let chrBusy;       // ビジー状態か？
+let chrStatus;     // 動作状態の通知
 
 /********** その他の定数・変数 ***********/
 
@@ -290,6 +300,10 @@ btn_connect.addEventListener('click', async function () {
     chrCommand   = await service.getCharacteristic(UUID_Command);
     chrLonTime   = await service.getCharacteristic(UUID_LonTime);
     chrBusy      = await service.getCharacteristic(UUID_Busy);
+    chrStatus    = await service.getCharacteristic(UUID_Status);
+    // 通知の開始
+    await chrStatus.startNotifications();
+    chrStatus.addEventListener('characteristicvaluechanged', onStatusChanged);
     // 画面表示切替
     panel_connect.style.display = "none";
     panel_main.style.display = "block";
@@ -355,6 +369,48 @@ function onDisconnected(event) {
   text_connect.innerText = "";
   panel_main.style.display = "none";
   panel_connect.style.display = "block";
+}
+
+// 動作状態の通知を受信したとき
+function onStatusChanged(event) {
+    const value = event.target.value;
+    const data = value.getUint8(0);
+    console.log("Received:", data);
+
+    switch(data){
+      case STA_INIT:
+        console.log("通知: 初期位置出し中");
+        ui_gray_out(true);
+        break;
+      case STA_INIT_DONE:
+        console.log("通知: 初期位置出し完了");
+        ui_gray_out(false);
+        ui_init_position();
+        break;
+      case STA_ROTATION:
+        console.log("通知: 自転");
+        ui_gray_out(true);
+        break;
+      case STA_REVOLUTOIN:
+        console.log("通知: 公転");
+        ui_gray_out(true);
+        break;
+      case STA_DEMO1:
+        console.log("通知:デモ1");
+        ui_gray_out(true);
+        break;
+      case STA_DEMO2:
+        console.log("通知: デモ2");
+        ui_gray_out(true);
+        break;
+      case STA_STOP:
+        console.log("通知: 停止");
+        ui_gray_out(false);
+        ui_invalid_position();
+        break;
+      default:
+        console.log("不明な状態通知: " + data);
+    }
 }
 
 /********** キャンバスの描画処理 ***********/
@@ -991,4 +1047,27 @@ function error_toast(message)
   jsFrame.showToast({
     html: message, align: 'top', duration: 5000
   });
+}
+
+/********** UIの状態処理 ***********/
+// UIのグレーアウト
+function ui_gray_out(gray_out)
+{
+  if(gray_out){
+    
+  }else{
+
+  }
+}
+
+// UIの初期位置表示
+function ui_init_position()
+{
+
+}
+
+// UIの不明位置表示
+function ui_invalid_position()
+{
+
 }
