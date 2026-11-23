@@ -149,9 +149,9 @@ function draw_canvas()
 /********** UIのイベントハンドラ ***********/
 
 // 季節キャンバス(ホロスコープ)のマウス/タッチイベント
-canvasSeason.addEventListener("mousedown", async function (e) {
+canvasSeason.addEventListener("pointerdown", async function (e) {
   const busy = await readBusy();
-  console.log("mousedown busy=" + busy);
+//console.log("mousedown busy=" + busy);
   if(!busy){
     canvasSeason_zodiac(e);
     canvasSeason_button(e); // --- ボタン処理も mousedown で ---
@@ -160,34 +160,13 @@ canvasSeason.addEventListener("mousedown", async function (e) {
   }
 }); 
 
-canvasSeason.addEventListener("touchstart",  async function (e) {
-  const busy = await readBusy();
-  if(!busy){
-    touch2mouse(e);
-    canvasSeason_zodiac(e);
-    canvasSeason_button(e); // --- ボタン処理も touchstart で ---
-  }else{
-    error_toast("渾天儀が動作中です。");
-  }
-}); 
-
 // 時刻キャンバス(時計)のマウス/タッチイベント
-canvasTime.addEventListener("mousedown", async function (e) {
+canvasTime.addEventListener("pointerdown", async function (e) {
   const busy = await readBusy();
+//console.log("mousedown busy=" + busy);
   if(!busy){
     canvasTime_clock(e);
     canvasTime_button(e); // --- ボタン処理も mousedown で ---
-  }else{
-    error_toast("渾天儀が動作中です。");
-  }
-}); 
-
-canvasTime.addEventListener("touchstart", async function (e) {
-  const busy = await readBusy();
-  if(!busy){
-    touch2mouse(e);
-    canvasTime_clock(e);
-    canvasTime_button(e); // --- ボタン処理も touchstart で ---
   }else{
     error_toast("渾天儀が動作中です。");
   }
@@ -604,16 +583,6 @@ function draw_clock(rad)
 }
 
 /********** キャンバスのイベント処理 ***********/
-
-// タッチイベントをマウスイベントに変換
-function touch2mouse(e){
-  e.preventDefault(); // デフォルトイベントをキャンセル
-  if(e.touches.length > 1) return; // マルチタッチ非対応
-
-  const bcr = e.target.getBoundingClientRect();
-  e.offsetX = e.changedTouches[0].clientX - bcr.x;
-  e.offsetY = e.changedTouches[0].clientY - bcr.y;
-}
 
 // 季節表示(ホロスコープ)の黄道判定
 function canvasSeason_zodiac(e) {
