@@ -2,8 +2,14 @@
 // 表示領域
 const panel_connect = document.getElementById('panel_connect');
 const panel_main    = document.getElementById('panel_main');
+// 切り替えボタン
+// (A) 横画面用
+const btn_screen_toggle = document.getElementById('btn_screen_toggle');
+// (B) 縦画面用
+const btn_season  = document.getElementById('btn_season');  // 季節
+const btn_time    = document.getElementById('btn_time');    // 時刻
+const btn_setting = document.getElementById('btn_setting'); // 設定
 // タブ
-const btn_screen_toggle = document.getElementById('btn_screen_toggle'); // メイン/設定切替
 const tab_season  = document.getElementById('tab_season');  // 季節画面
 const tab_time    = document.getElementById('tab_time');    // 時刻画面
 const tab_setting = document.getElementById('tab_setting'); // 設定画面
@@ -111,10 +117,9 @@ function draw_canvas()
   canvasSeason.width = canvas_size;
   canvasSeason.height = canvas_size;
   // 時刻キャンバス
-  const time_canvas_size = divTime.offsetWidth;
-  divTime.style.height = time_canvas_size + 'px';
-  canvasTime.width = time_canvas_size;
-  canvasTime.height = time_canvas_size;
+  divTime.style.height = canvas_size + 'px';
+  canvasTime.width = canvas_size;
+  canvasTime.height = canvas_size;
   // キャンバスの内接円の半径
   canvas_R = canvasSeason.width / 2;
 
@@ -176,7 +181,7 @@ canvasTime.addEventListener("pointerdown", async function (e) {
 }); 
 
 // 画面切替ボタン
-function show_tab(main, setting)
+function show_tab_A(main, setting)
 {
   tab_season.style.display  = main ? "block" : "none";
   tab_time.style.display    = main ? "block" : "none";
@@ -187,10 +192,38 @@ function show_tab(main, setting)
   btn_screen_toggle.textContent = main ? "設定" : "戻る";
 }
 
-btn_screen_toggle.addEventListener('click', function () {
-  const mainVisible = tab_season.style.display === "block";
-  show_tab(!mainVisible, mainVisible);
-});
+function show_tab_B(season, time, setting)
+{
+  btn_season.className  = season ?  "btn btn-primary rounded-3" : "btn btn-outline-primary rounded-3";
+  btn_time.className    = time ?    "btn btn-primary rounded-3" : "btn btn-outline-primary rounded-3";
+  btn_setting.className = setting ? "btn btn-primary rounded-3" : "btn btn-outline-primary rounded-3";
+
+  tab_season.style.display  = season ?  "block" : "none";
+  tab_time.style.display    = time ?    "block" : "none";
+  tab_setting.style.display = setting ? "block" : "none";
+
+  panel_date_time.style.display    = setting ? "none" : "block";
+  panel_sun_position.style.display = setting ? "none" : "block";
+}
+
+if(btn_screen_toggle != null){
+  btn_screen_toggle.addEventListener('click', function () {
+    const mainVisible = tab_season.style.display === "block";
+    show_tab_A(!mainVisible, mainVisible);
+  });
+}
+
+if(btn_season != null && btn_time != null && btn_setting != null){
+  btn_season.addEventListener('click', function () {
+    show_tab_B(true, false, false);
+  });
+  btn_time.addEventListener('click', function () {
+    show_tab_B(false, true, false);
+  });
+  btn_setting.addEventListener('click', function () {
+    show_tab_B(false, false, true);
+  });
+}
 
 // 日時が変更されたとき
 text_datetime.addEventListener('change', async function (e) {
