@@ -6,6 +6,11 @@ const panel_main    = document.getElementById('panel_main');
 const tab_season  = document.getElementById('tab_season');  // 季節
 const tab_time    = document.getElementById('tab_time');    // 時刻
 const tab_setting = document.getElementById('tab_setting'); // 設定
+const tab_content1 = document.getElementById('tab_content1'); // 季節画面
+const tab_content2 = document.getElementById('tab_content2'); // 時刻画面
+const tab_content3 = document.getElementById('tab_content3'); // 設定画面
+const panel_date_time = document.getElementById('panel_date_time');
+const panel_sun_position = document.getElementById('panel_sun_position');
 // キャンバスとコンテキスト
 const canvasSeason = document.getElementById('canvasSeason'); // 季節
 const canvasTime   = document.getElementById('canvasTime');   // 時刻
@@ -172,22 +177,29 @@ canvasTime.addEventListener("pointerdown", async function (e) {
   }
 }); 
 
-// タブ:季節 が開いたとき
-tab_season.addEventListener('shown.bs.tab', function (e) {
-    panel_date_time.style.display = "block";
-    panel_sun_position.style.display = "block";
-    //draw_canvas();
+// 画面切替ボタン
+function show_tab(season, time, setting)
+{
+  tab_content1.style.display = season ? "block" : "none";
+  tab_content2.style.display = time ? "block" : "none";
+  tab_content3.style.display = setting ? "block" : "none";
+
+  tab_season.className = season ? "btn btn-primary rounded-pill" : "btn btn-outline-primary rounded-pill";
+  tab_time.className = time ? "btn btn-primary rounded-pill" : "btn btn-outline-primary rounded-pill";
+  tab_setting.className = setting ? "btn btn-primary rounded-pill" : "btn btn-outline-primary rounded-pill";
+
+  panel_date_time.style.display = setting ? "none" : "block";
+  panel_sun_position.style.display = setting ? "none" : "block";
+}
+
+tab_season.addEventListener('click', function () {
+  show_tab(true, false, false);
 });
-// タブ:時刻 が開いたとき
-tab_time.addEventListener('shown.bs.tab', function (e) {
-  panel_date_time.style.display = "block";
-  panel_sun_position.style.display = "block";
-  //draw_canvas();
+tab_time.addEventListener('click', function () {
+  show_tab(false, true, false);
 });
-// タブ:設定 が開いたとき
-tab_setting.addEventListener('shown.bs.tab', function (e) {
-  panel_date_time.style.display = "none";
-  panel_sun_position.style.display = "none";
+tab_setting.addEventListener('click', function () {
+  show_tab(false, false, true);
 });
 
 // 日時が変更されたとき
