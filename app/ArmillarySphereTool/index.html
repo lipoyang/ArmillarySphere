@@ -12,7 +12,7 @@
   <body>
     <div class="container" style="max-width: 400px">
       <!-- (1) 接続画面 -->
-      <div id="panel_connect" style="display:none">
+      <div id="panel_connect">
         <div class="row m-2">
           <div class="col text-center"><h1>渾天儀コントローラ</h1></div>
         </div>
@@ -27,32 +27,32 @@
       </div> <!-- (1) 接続画面 -->
       
       <!-- (2) メイン画面 -->
-      <div id="panel_main">
+      <div id="panel_main" style="display:none">
         <!-- 画面切替ボタン -->
         <div class="row g-2">
           <div class="col"><div class="d-grid">
-            <button id="tab_season" type="button" class="btn btn-primary rounded-pill">季節</button>
+            <button id="btn_season" type="button" class="btn btn-primary rounded-3">季節</button>
           </div></div>
           <div class="col"><div class="d-grid">
-            <button id="tab_time" type="button" class="btn btn-outline-primary rounded-pill">時刻</button>
+            <button id="btn_time" type="button" class="btn btn-outline-primary rounded-3">時刻</button>
           </div></div>
           <div class="col"><div class="d-grid">
-            <button id="tab_setting" type="button" class="btn btn-outline-primary rounded-pill">設定</button>
+            <button id="btn_setting" type="button" class="btn btn-outline-primary rounded-3">設定</button>
           </div></div>
         </div>
 
         <!-- 画面の中身 -->
         <div id="tab_parent">
           <!-- 季節 -->
-          <div id="tab_content1" style="display:block" class="border border-primary rounded my-1">
+          <div id="tab_season" style="display:block" class="border border-primary rounded my-1">
             <canvas id='canvasSeason'></canvas>
           </div>
           <!-- 時刻 -->
-          <div id="tab_content2" style="display:none" class="border border-primary rounded my-1">
+          <div id="tab_time" style="display:none" class="border border-primary rounded my-1">
             <canvas id='canvasTime'></canvas>
           </div>
           <!-- 設定 -->
-          <div id="tab_content3" style="display:none" class="border border-primary rounded my-1">
+          <div id="tab_setting" style="display:none" class="border border-primary rounded my-1">
             <div class="row my-2">
               <div class="col ms-3" style="font-size: 1.2rem">
                 タイムゾーン　　UTC 

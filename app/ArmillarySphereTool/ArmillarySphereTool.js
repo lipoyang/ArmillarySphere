@@ -3,12 +3,12 @@
 const panel_connect = document.getElementById('panel_connect');
 const panel_main    = document.getElementById('panel_main');
 // タブ
-const tab_season  = document.getElementById('tab_season');  // 季節
-const tab_time    = document.getElementById('tab_time');    // 時刻
-const tab_setting = document.getElementById('tab_setting'); // 設定
-const tab_content1 = document.getElementById('tab_content1'); // 季節画面
-const tab_content2 = document.getElementById('tab_content2'); // 時刻画面
-const tab_content3 = document.getElementById('tab_content3'); // 設定画面
+const btn_season  = document.getElementById('btn_season');  // 季節
+const btn_time    = document.getElementById('btn_time');    // 時刻
+const btn_setting = document.getElementById('btn_setting'); // 設定
+const tab_season  = document.getElementById('tab_season');  // 季節画面
+const tab_time    = document.getElementById('tab_time');    // 時刻画面
+const tab_setting = document.getElementById('tab_setting'); // 設定画面
 const panel_date_time = document.getElementById('panel_date_time');
 const panel_sun_position = document.getElementById('panel_sun_position');
 // キャンバスとコンテキスト
@@ -106,8 +106,8 @@ function draw_canvas()
 {
   // キャンバスサイスの調整
   const divParent = document.getElementById('tab_parent');
-  const divSeason = document.getElementById('tab_content1'); // 季節キャンバスのラッパ
-  const divTime   = document.getElementById('tab_content2'); // 時刻キャンバスのラッパ
+  const divSeason = document.getElementById('tab_season'); // 季節キャンバスのラッパ
+  const divTime   = document.getElementById('tab_time');   // 時刻キャンバスのラッパ
   // 季節キャンバス
   const canvas_size = divParent.offsetWidth;
   divSeason.style.height = canvas_size + 'px';
@@ -180,25 +180,25 @@ canvasTime.addEventListener("pointerdown", async function (e) {
 // 画面切替ボタン
 function show_tab(season, time, setting)
 {
-  tab_content1.style.display = season ? "block" : "none";
-  tab_content2.style.display = time ? "block" : "none";
-  tab_content3.style.display = setting ? "block" : "none";
+  btn_season.className  = season ?  "btn btn-primary rounded-3" : "btn btn-outline-primary rounded-3";
+  btn_time.className    = time ?    "btn btn-primary rounded-3" : "btn btn-outline-primary rounded-3";
+  btn_setting.className = setting ? "btn btn-primary rounded-3" : "btn btn-outline-primary rounded-3";
 
-  tab_season.className = season ? "btn btn-primary rounded-pill" : "btn btn-outline-primary rounded-pill";
-  tab_time.className = time ? "btn btn-primary rounded-pill" : "btn btn-outline-primary rounded-pill";
-  tab_setting.className = setting ? "btn btn-primary rounded-pill" : "btn btn-outline-primary rounded-pill";
+  tab_season.style.display  = season ?  "block" : "none";
+  tab_time.style.display    = time ?    "block" : "none";
+  tab_setting.style.display = setting ? "block" : "none";
 
-  panel_date_time.style.display = setting ? "none" : "block";
+  panel_date_time.style.display    = setting ? "none" : "block";
   panel_sun_position.style.display = setting ? "none" : "block";
 }
 
-tab_season.addEventListener('click', function () {
+btn_season.addEventListener('click', function () {
   show_tab(true, false, false);
 });
-tab_time.addEventListener('click', function () {
+btn_time.addEventListener('click', function () {
   show_tab(false, true, false);
 });
-tab_setting.addEventListener('click', function () {
+btn_setting.addEventListener('click', function () {
   show_tab(false, false, true);
 });
 
