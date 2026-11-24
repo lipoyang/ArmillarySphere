@@ -95,6 +95,10 @@ static void showStatus(OpMode opMode, bool isOnline, bool isSelecting)
 void M5UI::begin()
 {
     auto cfg = M5.config();
+    cfg.internal_imu = false;
+    cfg.internal_rtc = false;
+    cfg.internal_mic = false;
+    cfg.internal_spk = false;
     M5.begin(cfg);
 
     // 画面のクリア（黒背景）

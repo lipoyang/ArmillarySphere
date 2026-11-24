@@ -22,7 +22,7 @@ CHR_LT  chrLonTime   ("328E1678-11B5-5D34-AAD2-EF1A4A2957EB", BLERead | BLEWrite
 // ビジー状態か？
 CHR_U8  chrBusy      ("31180989-2299-A86F-C856-B2154171C07B", BLERead);
 // 動作状態を通知
-CHR_U8  chrStatus   ("3A7B9D5C-0E6F-4A1B-8D2C-9F1A4A2957EB", BLERead | BLENotify);
+CHR_U8  chrStatus    ("3A7B9D5C-0E6F-4A1B-8D2C-9F1A4A2957EB", BLERead | BLENotify);
 
 // コマンド定数
 const uint8_t CMD_INIT       = 0x80; // 初期位置

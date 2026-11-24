@@ -506,11 +506,10 @@ static void debugPrint()
 // 初期化
 void setup()
 {
-    Serial.begin(115200);
-
     ui.begin();
     ui.onSetMode = onSetMode;
 
+    Serial.begin(115200);
     //while(!Serial);
     //delay(100);
     Serial.println("Start!");
