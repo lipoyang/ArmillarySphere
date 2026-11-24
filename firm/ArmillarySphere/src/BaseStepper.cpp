@@ -16,13 +16,16 @@ void BaseStepper::update()
   if((pos_now != pos_target) || (infinit == true))
   {
     int now = getTime();
-    int elapse = now - t0;
-    if(elapse >= tn)
+//  int elapse = now - t0;
+//  if(elapse >= tn)
+    int elapse = now - t;
+    if(elapse >= dt)
     {
       takeStep((dir * POL > 0) ? 1 : 0, n % 2);
       if((n % 2) == 0) pos_now += dir;
       n++;
-      tn = (int)((int64_t)T * (int64_t)n / (int64_t)N);
+      // tn = (int)((int64_t)T * (int64_t)n / (int64_t)N);
+      t = now;
     }
   }
 }
@@ -52,8 +55,10 @@ void BaseStepper::setStepT(int step, int msec)
   this->n = 1;
   this->N = abs(step) * 2;
   this->T = msec * 1000;
-  this->t0 = getTime();
-  this->tn = T / N;
+//  this->t0 = getTime();
+//  this->tn = T / N;
+  this->t = getTime();
+  this->dt = T / N;
   
   this->infinit = false;
 }
@@ -71,8 +76,10 @@ void BaseStepper::setStepV(int step, int sps)
   this->n = 1;
   this->N = abs(step) * 2;
   this->T = (int)((int64_t)abs(step) * 1000000 / (int64_t)sps);
-  this->t0 = getTime();
-  this->tn = T / N;
+//  this->t0 = getTime();
+//  this->tn = T / N;
+  this->t = getTime();
+  this->dt = T / N;
   
   this->infinit = false;
 }
@@ -90,8 +97,10 @@ void BaseStepper::setPosT(int pos, int msec)
   this->n = 1;
   this->N = abs(step) * 2;
   this->T = msec * 1000;
-  this->t0 = getTime();
-  this->tn = T / N;
+//  this->t0 = getTime();
+//  this->tn = T / N;
+  this->t = getTime();
+  this->dt = T / N;
   
   this->infinit = false;
 }
@@ -110,8 +119,10 @@ void BaseStepper::setPosV(int pos, int sps)
   this->n = 1;
   this->N = abs(step) * 2;
   this->T = (int)((int64_t)abs(step) * 1000000 / (int64_t)sps);
-  this->t0 = getTime();
-  this->tn = T / N;
+//  this->t0 = getTime();
+//  this->tn = T / N;
+  this->t = getTime();
+  this->dt = T / N;
   
   this->infinit = false;
 }

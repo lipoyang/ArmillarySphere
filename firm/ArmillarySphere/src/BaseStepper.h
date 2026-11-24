@@ -10,7 +10,8 @@ public:
         dir = 0;
         n = N = 0;
         pos_now = pos_target = 0;
-        T = t0 = tn = 0;
+//      T = t0 = tn = 0;
+        T = t = dt = 0;
     }
     // デストラクタ
     virtual ~BaseStepper() {}
@@ -64,7 +65,9 @@ private:
     int n;          // ステップカウント値
     int N;          // ステップカウントの目標値
     int T;          // 始点から目標位置までの移動時間[usec]
-    int t0;         // 始点の時刻[usec]
-    int tn;         // 次のステップ時刻[usec]
+//  int t0;         // 始点の時刻[usec]
+//  int tn;         // 次のステップ時刻[usec]
+    int t;          // 前回のステップ時刻[usec]
+    int dt;         // ステップ間隔[usec]
     bool infinit;   // 無限回転か？
 };
